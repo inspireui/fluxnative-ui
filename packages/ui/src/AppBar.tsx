@@ -50,11 +50,11 @@ function Action({ label, icon, onPress, disabled }: AppBarActionProps) {
   );
 }
 
-function BackButton({ onPress, color }: { onPress: () => void; color: string }) {
+function BackButton({ onPress, color, label }: { onPress: () => void; color: string; label: string }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Back"
+      accessibilityLabel={label}
       onPress={onPress}
       hitSlop={6}
       style={({ pressed }) => [styles.action, pressed && styles.pressed]}
@@ -72,6 +72,8 @@ export interface AppBarProps {
    * unconditionally: `onBack={router.back}`.
    */
   onBack?: () => void;
+  /** Screen-reader name of the drawn back button. Localise it; defaults to "Back". */
+  backLabel?: string;
   /** iOS-style large title that collapses into the bar on scroll (native tier). */
   largeTitle?: boolean;
   /** `clear` only when the bar sits over a photo or video. */
@@ -88,7 +90,15 @@ function slot(children: ReactNode, type: typeof Leading | typeof Trailing): Reac
   return found?.props.children;
 }
 
-function AppBarRoot({ title, onBack, largeTitle = false, variant = 'regular', tier: forced, children }: AppBarProps) {
+function AppBarRoot({
+  title,
+  onBack,
+  backLabel = 'Back',
+  largeTitle = false,
+  variant = 'regular',
+  tier: forced,
+  children,
+}: AppBarProps) {
   const tier = useGlassTier('bar', forced);
   const host = useChromeHost();
   const screen = useScreen();
@@ -129,7 +139,7 @@ function AppBarRoot({ title, onBack, largeTitle = false, variant = 'regular', ti
         {/* The bar is the glass; its buttons sit on it, so plain Views here —
             a native GlassContainer only hosts glass surfaces. */}
         <View style={styles.side}>
-          {onBack ? <BackButton onPress={onBack} color={palette.foreground} /> : null}
+          {onBack ? <BackButton onPress={onBack} color={palette.foreground} label={backLabel} /> : null}
           {leading}
         </View>
         {title ? (

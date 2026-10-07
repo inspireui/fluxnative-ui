@@ -31,7 +31,7 @@ export default function Home() {
   - The whole API fits in an 8 KB `AGENTS.md` index ([`docs/llm/AGENTS.index.md`](docs/llm/AGENTS.index.md)).
   - Props are closed string unions, so TypeScript rejects unknown values.
   - The runtime resolver warns on unknown classes and names the valid alternative.
-  - An ESLint plugin will apply the same check at build time.
+  - `pnpm typecheck` rejects unknown prop values; there is no ESLint plugin yet (see Known gaps).
 
 ## The glass ladder
 

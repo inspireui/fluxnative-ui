@@ -212,7 +212,7 @@ function color(name: string, scheme: ColorScheme): string | undefined {
 }
 
 function hintFor(cls: string): string {
-  if (cls.includes('[')) return 'Arbitrary values are not allowed. Use a token class or `unsafeStyle`.';
+  if (cls.includes('[')) return 'Arbitrary values are not allowed. Use a token class, or pass the one-off value through `style`.';
   if (/^(bg|text|border)-[a-z]+-\d{2,3}$/.test(cls)) {
     return `Palette colors don't exist in FluxNative UI. Use a semantic color: ${[...COLOR_NAMES].filter((c) => !c.startsWith('glass')).join(', ')}.`;
   }

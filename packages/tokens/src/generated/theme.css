@@ -21,6 +21,7 @@
   --color-accent: unset;
   --color-accent-foreground: unset;
   --color-destructive: unset;
+  --color-destructive-foreground: unset;
   --color-success: unset;
   --color-warning: unset;
   --color-border: unset;
@@ -52,6 +53,7 @@
       --color-accent: #e9e9ee;
       --color-accent-foreground: #0a0a0b;
       --color-destructive: #ff3b30;
+      --color-destructive-foreground: #ffffff;
       --color-success: #34c759;
       --color-warning: #ff9500;
       --color-border: rgba(60, 60, 67, 0.18);
@@ -80,6 +82,7 @@
       --color-accent: #2c2c2e;
       --color-accent-foreground: #f5f5f7;
       --color-destructive: #ff453a;
+      --color-destructive-foreground: #ffffff;
       --color-success: #30d158;
       --color-warning: #ff9f0a;
       --color-border: rgba(84, 84, 88, 0.6);

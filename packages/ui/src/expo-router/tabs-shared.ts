@@ -28,6 +28,9 @@ export function collectTabs(children: ReactNode): FluxTabProps[] {
 
 export interface FluxTabsProps {
   children?: ReactNode;
-  /** iOS 26+: how the native tab bar shrinks while content scrolls. */
+  /**
+   * iOS 26+ only: how the native tab bar shrinks while content scrolls.
+   * Android and web draw the floating `TabBar`, which ignores it.
+   */
   minimize?: 'automatic' | 'never' | 'onScrollDown' | 'onScrollUp';
 }

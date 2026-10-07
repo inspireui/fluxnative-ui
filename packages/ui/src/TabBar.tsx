@@ -4,7 +4,7 @@
 // instead and this component never renders.
 
 import React, { createContext, type ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { chrome, text } from '@fluxnative/tokens';
 import { GlassSurface, type GlassTier, type GlassVariant } from '@fluxnative/glass';
@@ -18,11 +18,26 @@ export interface TabBarItem {
   badge?: number | string | true;
 }
 
+/**
+ * `floating`: an inset glass pill (iOS and web). `bar`: an edge-to-edge glass
+ * bar in the Material 3 navigation-bar shape, the default on Android.
+ */
+export type TabBarShape = 'floating' | 'bar';
+
+/** The shape `TabBar` and `useTabBarInset` use when none is passed. */
+export function defaultTabBarShape(): TabBarShape {
+  return Platform.OS === 'android' ? 'bar' : 'floating';
+}
+
+/** Extra height of the Material 3 bar over the floating pill. */
+const BAR_EXTRA = 24;
+
 export interface TabBarProps {
   items: TabBarItem[];
   activeKey: string;
   onSelect: (key: string) => void;
   variant?: GlassVariant;
+  shape?: TabBarShape;
   /** Force a glass tier. For tests and screenshots only. */
   tier?: GlassTier;
 }
@@ -31,23 +46,32 @@ export interface TabBarProps {
 export const FloatingTabBarContext = createContext(false);
 
 /** Total height the tab bar covers, for content that must clear it. */
-export function useTabBarInset(): number {
+export function useTabBarInset(shape: TabBarShape = defaultTabBarShape()): number {
   const insets = useSafeAreaInsets();
+  if (shape === 'bar') return chrome.tabBarHeight + BAR_EXTRA + insets.bottom;
   return chrome.tabBarHeight + Math.max(insets.bottom, 12) + 8;
 }
 
-export function TabBar({ items, activeKey, onSelect, variant = 'regular', tier }: TabBarProps) {
+export function TabBar({ items, activeKey, onSelect, variant = 'regular', shape = defaultTabBarShape(), tier }: TabBarProps) {
   const insets = useSafeAreaInsets();
   const palette = usePalette();
-  const height = chrome.tabBarHeight;
+  const bar = shape === 'bar';
+  const height = bar ? chrome.tabBarHeight + BAR_EXTRA : chrome.tabBarHeight;
+  const dock = bar
+    ? { bottom: 0, left: 0, right: 0 }
+    : { bottom: Math.max(insets.bottom, 12), left: chrome.tabBarInset, right: chrome.tabBarInset };
 
   return (
-    <View
-      style={[styles.dock, { bottom: Math.max(insets.bottom, 12), left: chrome.tabBarInset, right: chrome.tabBarInset }]}
-      pointerEvents="box-none"
-    >
-      <GlassSurface role="surface" variant={variant} tier={tier} radius={height / 2} style={[styles.pill, { height }]}>
-        <View style={styles.row} accessibilityRole="tablist">
+    <View style={[styles.dock, dock]} pointerEvents="box-none">
+      <GlassSurface
+        role="surface"
+        variant={variant}
+        tier={tier}
+        radius={bar ? 0 : height / 2}
+        // Shadow color carries the scrim token's alpha, so the opacity here is a multiplier.
+        style={[bar ? styles.bar : styles.pill, { height: bar ? height + insets.bottom : height, shadowColor: palette.scrim }]}
+      >
+        <View style={[styles.row, bar && { paddingBottom: insets.bottom, paddingHorizontal: 8 }]} accessibilityRole="tablist">
           {items.map((item) => {
             const focused = item.key === activeKey;
             const color = focused ? palette.primary : palette['muted-foreground'];
@@ -60,15 +84,22 @@ export function TabBar({ items, activeKey, onSelect, variant = 'regular', tier }
                 onPress={() => onSelect(item.key)}
                 style={({ pressed }) => [styles.item, pressed && styles.pressed]}
               >
-                <View
-                  style={[styles.indicator, { borderRadius: (height - 8) / 2 }, focused && { backgroundColor: palette.accent }]}
-                >
+                <View style={styles.indicator}>
+                  {/* M3 bar: the active indicator is a pill behind the icon; pill: the whole item. */}
+                  <View
+                    style={[
+                      bar ? styles.iconWell : StyleSheet.absoluteFill,
+                      bar ? null : { borderRadius: (height - 8) / 2 },
+                      focused && { backgroundColor: palette.accent },
+                    ]}
+                    pointerEvents="none"
+                  />
                   <View>
                     {item.icon({ focused, color })}
                     {item.badge !== undefined ? (
                       <View style={[styles.badge, { backgroundColor: palette.destructive }]}>
                         {item.badge === true ? null : (
-                          <Text style={styles.badgeText} numberOfLines={1}>
+                          <Text style={[styles.badgeText, { color: palette['destructive-foreground'] }]} numberOfLines={1}>
                             {item.badge}
                           </Text>
                         )}
@@ -91,12 +122,18 @@ export function TabBar({ items, activeKey, onSelect, variant = 'regular', tier }
 const styles = StyleSheet.create({
   dock: { position: 'absolute', zIndex: 10 },
   pill: {
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.3,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
+  bar: {
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 8,
+  },
+  iconWell: { position: 'absolute', top: 4, width: 64, height: 32, borderRadius: 16 },
   row: { flex: 1, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4 },
   item: { flex: 1, height: '100%', padding: 4 },
   indicator: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 2 },
@@ -113,5 +150,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeText: { color: '#ffffff', fontSize: 10, fontWeight: '700' },
+  badgeText: { fontSize: 10, fontWeight: '700' },
 });

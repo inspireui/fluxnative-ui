@@ -11,3 +11,6 @@ export type {
   BlurProps,
 } from './adapter.ts';
 export { useGlassEnvironment, NativeBarContext } from './environment.ts';
+export { withAlpha } from './color.ts';
+export { GLASS_CONTRACT, GLASS_CONTRACT_VERSION, GLASS_LOOK, hostPalette } from './contract.ts';
+export type { GlassContract, GlassHostPalette } from './contract.ts';

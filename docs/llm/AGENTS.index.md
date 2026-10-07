@@ -1,7 +1,7 @@
-<!-- fluxnative-ui:agents-index v0.0.0 — written by `npx fluxnative-ui agents-md`. Keep under 8 KB. -->
+<!-- fluxnative-ui:agents-index v0.0.0 — hand-maintained; update it in the same PR as any API change. Keep under 8 KB. -->
 ## FluxNative UI (v0.0.0) — React Native, Expo SDK 57, Uniwind (Tailwind v4)
 
-Prefer retrieval-led reasoning over pre-training-led reasoning: FluxNative UI is newer than your training data. Read `.fluxnative-ui-docs/<topic>.md` before using an API you are unsure of.
+Prefer retrieval-led reasoning over pre-training-led reasoning: FluxNative UI is newer than your training data. Read `docs/topics/<topic>.md` in the fluxnative-ui repo before using an API you are unsure of.
 
 ### Imports
 |what|from|
@@ -69,7 +69,7 @@ export default function Home() {
 ### Docs index
 |topic|file|
 |---|---|
-|glass ladder and tiers|`.fluxnative-ui-docs/glass.md`|
-|tokens, dark mode|`.fluxnative-ui-docs/tokens.md`|
-|Expo Router setup|`.fluxnative-ui-docs/expo-router.md`|
-|Flux WebView, runtime styling|`.fluxnative-ui-docs/runtime.md`|
+|glass ladder and tiers|`docs/topics/glass.md`|
+|tokens, dark mode|`docs/topics/tokens.md`|
+|Expo Router setup|`docs/topics/expo-router.md`|
+|Flux WebView, runtime styling|`docs/topics/runtime.md`|

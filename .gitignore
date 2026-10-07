@@ -8,4 +8,5 @@ android/
 .DS_Store
 dist-web/
 expo-env.d.ts
-.claude/
+.claude/*
+!.claude/launch.json

@@ -18,6 +18,7 @@ export const colors = {
     "accent": "#e9e9ee",
     "accent-foreground": "#0a0a0b",
     "destructive": "#ff3b30",
+    "destructive-foreground": "#ffffff",
     "success": "#34c759",
     "warning": "#ff9500",
     "border": "rgba(60, 60, 67, 0.18)",
@@ -46,6 +47,7 @@ export const colors = {
     "accent": "#2c2c2e",
     "accent-foreground": "#f5f5f7",
     "destructive": "#ff453a",
+    "destructive-foreground": "#ffffff",
     "success": "#30d158",
     "warning": "#ff9f0a",
     "border": "rgba(84, 84, 88, 0.6)",
@@ -92,6 +94,8 @@ export type ColorName =
   | 'accent-foreground'
   /** Destructive action and errors. */
   | 'destructive'
+  /** Text and icons on a destructive fill (badges, danger buttons). */
+  | 'destructive-foreground'
   /** Positive status. */
   | 'success'
   /** Caution status. */
