@@ -1,15 +1,15 @@
 {
-  "name": "@flux-ui/tokens",
+  "name": "@fluxnative/tokens",
   "version": "0.0.0",
-  "description": "Flux UI design tokens: W3C DTCG source compiled to TypeScript constants and a Tailwind v4 / Uniwind theme.",
+  "description": "FluxNative UI design tokens: W3C DTCG source compiled to TypeScript constants and a Tailwind v4 / Uniwind theme.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inspireui/flux-ui.git",
+    "url": "git+https://github.com/inspireui/fluxnative-ui.git",
     "directory": "packages/tokens"
   },
-  "homepage": "https://github.com/inspireui/flux-ui#readme",
-  "bugs": "https://github.com/inspireui/flux-ui/issues",
+  "homepage": "https://github.com/inspireui/fluxnative-ui#readme",
+  "bugs": "https://github.com/inspireui/fluxnative-ui/issues",
   "type": "module",
   "main": "src/index.ts",
   "react-native": "src/index.ts",

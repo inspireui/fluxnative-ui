@@ -1,11 +1,11 @@
 import '../global.css';
-import '@flux-ui/glass/expo';
+import '@fluxnative/glass/expo';
 
 import React from 'react';
 import { useColorScheme } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { FluxStack } from '@flux-ui/core/expo-router';
+import { FluxStack } from '@fluxnative/ui/expo-router';
 
 export default function RootLayout() {
   const dark = useColorScheme() === 'dark';

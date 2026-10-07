@@ -1,5 +1,5 @@
 {
-  "name": "flux-ui-monorepo",
+  "name": "fluxnative-ui-monorepo",
   "private": true,
   "packageManager": "pnpm@11.4.0",
   "engines": {

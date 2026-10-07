@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
-import { NativeBarContext } from '@flux-ui/glass';
+import { NativeBarContext } from '@fluxnative/glass';
 import { ChromeHostProvider, usePalette } from '../provider.tsx';
 import { Tab, collectTabs, type FluxTabsProps } from './tabs-shared.ts';
 

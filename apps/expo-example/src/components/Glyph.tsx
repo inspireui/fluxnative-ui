@@ -1,5 +1,5 @@
 // Tiny drawn glyphs so the example needs no icon font. A real app would use
-// expo-symbols / an icon set; Flux UI takes any ReactNode as an icon.
+// expo-symbols / an icon set; FluxNative UI takes any ReactNode as an icon.
 
 import React from 'react';
 import { View } from 'react-native';

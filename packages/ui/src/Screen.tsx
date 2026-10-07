@@ -31,7 +31,7 @@ const ScreenContext = createContext<ScreenState | null>(null);
 export const useScreen = () => useContext(ScreenContext);
 
 /** Components that float above content mark themselves with this. */
-export const TOP_CHROME = Symbol.for('flux-ui.top-chrome');
+export const TOP_CHROME = Symbol.for('fluxnative-ui.top-chrome');
 
 const ClassView = View as ComponentType<ViewProps & { className?: string }>;
 

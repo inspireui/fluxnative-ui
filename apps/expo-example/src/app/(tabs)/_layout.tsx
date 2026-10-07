@@ -1,5 +1,5 @@
 import React from 'react';
-import { FluxTabs } from '@flux-ui/core/expo-router';
+import { FluxTabs } from '@fluxnative/ui/expo-router';
 import { Glyph } from '../../components/Glyph';
 
 export default function TabsLayout() {

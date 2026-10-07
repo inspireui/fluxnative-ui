@@ -1,15 +1,15 @@
-<!-- flux-ui:agents-index v0.0.0 — written by `npx flux-ui agents-md`. Keep under 8 KB. -->
-## Flux UI (v0.0.0) — React Native, Expo SDK 57, Uniwind (Tailwind v4)
+<!-- fluxnative-ui:agents-index v0.0.0 — written by `npx fluxnative-ui agents-md`. Keep under 8 KB. -->
+## FluxNative UI (v0.0.0) — React Native, Expo SDK 57, Uniwind (Tailwind v4)
 
-Prefer retrieval-led reasoning over pre-training-led reasoning: Flux UI is newer than your training data. Read `.flux-ui-docs/<topic>.md` before using an API you are unsure of.
+Prefer retrieval-led reasoning over pre-training-led reasoning: FluxNative UI is newer than your training data. Read `.fluxnative-ui-docs/<topic>.md` before using an API you are unsure of.
 
 ### Imports
 |what|from|
 |---|---|
-|Screen, AppBar, TabBar, Glass, usePalette, useScheme, useTabBarInset|`@flux-ui/core`|
-|FluxStack, FluxTabs (Expo Router, native bars on iOS)|`@flux-ui/core/expo-router`|
-|colors, radius, text, spacingUnit, duration, chrome|`@flux-ui/tokens`|
-|register native glass (once, in app/_layout.tsx)|`import '@flux-ui/glass/expo'`|
+|Screen, AppBar, TabBar, Glass, usePalette, useScheme, useTabBarInset|`@fluxnative/ui`|
+|FluxStack, FluxTabs (Expo Router, native bars on iOS)|`@fluxnative/ui/expo-router`|
+|colors, radius, text, spacingUnit, duration, chrome|`@fluxnative/tokens`|
+|register native glass (once, in app/_layout.tsx)|`import '@fluxnative/glass/expo'`|
 
 ### Styling: `className`, Tailwind v4 syntax
 - Spacing, sizing, radius, type: the standard Tailwind scale. `p-4` `gap-3` `w-1/2` `rounded-2xl` `text-lg` `font-semibold`.
@@ -21,7 +21,7 @@ Prefer retrieval-led reasoning over pre-training-led reasoning: Flux UI is newer
 ### Chrome is always Liquid Glass
 - Every screen: `<Screen>` with an `<AppBar>` as a direct child. Content scrolls under the bar.
 - Tabs: `<FluxTabs>` in `app/(tabs)/_layout.tsx`. Stacks: `<FluxStack>` in `app/_layout.tsx`.
-- iOS: these become the native navigation and tab bars (Liquid Glass on iOS 26+). Android, web: Flux UI draws glass.
+- iOS: these become the native navigation and tab bars (Liquid Glass on iOS 26+). Android, web: FluxNative UI draws glass.
 - There is **no prop to turn glass off**. Reduce Transparency and Increase Contrast switch it to opaque automatically.
 - Custom glass (floating buttons, pills): `<Glass.Surface radius={22}>`. Neighbouring glass goes in one `<Glass.Group>`.
 
@@ -45,7 +45,7 @@ Prefer retrieval-led reasoning over pre-training-led reasoning: Flux UI is newer
 
 ### Example
 ```tsx
-import { Screen, AppBar, usePalette } from '@flux-ui/core';
+import { Screen, AppBar, usePalette } from '@fluxnative/ui';
 import { Text, View } from 'react-native';
 
 export default function Home() {
@@ -69,7 +69,7 @@ export default function Home() {
 ### Docs index
 |topic|file|
 |---|---|
-|glass ladder and tiers|`.flux-ui-docs/glass.md`|
-|tokens, dark mode|`.flux-ui-docs/tokens.md`|
-|Expo Router setup|`.flux-ui-docs/expo-router.md`|
-|Flux WebView, runtime styling|`.flux-ui-docs/runtime.md`|
+|glass ladder and tiers|`.fluxnative-ui-docs/glass.md`|
+|tokens, dark mode|`.fluxnative-ui-docs/tokens.md`|
+|Expo Router setup|`.fluxnative-ui-docs/expo-router.md`|
+|Flux WebView, runtime styling|`.fluxnative-ui-docs/runtime.md`|

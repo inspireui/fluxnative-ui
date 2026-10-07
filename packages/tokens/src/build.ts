@@ -1,4 +1,4 @@
-// `pnpm --filter @flux-ui/tokens build`: reads tokens/*.tokens.json and
+// `pnpm --filter @fluxnative/tokens build`: reads tokens/*.tokens.json and
 // writes src/generated/{tokens.ts,theme.css}. `--global-css <path>` also
 // writes an app's whole Uniwind entry file (repeatable). `--check` exits 1
 // when any output is stale instead of writing it (for CI).

@@ -1,5 +1,5 @@
 {
-  "$description": "Flux UI semantic colors \u2014 light scheme. Names follow shadcn/ui so models already know them.",
+  "$description": "FluxNative UI semantic colors \u2014 light scheme. Names follow shadcn/ui so models already know them.",
   "color": {
     "$type": "color",
     "background": {

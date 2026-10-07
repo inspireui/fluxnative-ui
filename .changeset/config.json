@@ -2,8 +2,8 @@
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
   "changelog": "@changesets/cli/changelog",
   "commit": false,
-  "fixed": [["@flux-ui/*"]],
+  "fixed": [["@fluxnative/*"]],
   "access": "public",
   "baseBranch": "main",
-  "ignore": ["flux-ui-expo-example"]
+  "ignore": ["fluxnative-ui-expo-example"]
 }

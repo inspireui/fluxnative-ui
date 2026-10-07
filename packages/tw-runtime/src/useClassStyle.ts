@@ -17,7 +17,7 @@ export function useClassStyle(className: string | undefined): Style {
       for (const { className: cls, hint } of unknown) {
         if (warned.has(cls)) continue;
         warned.add(cls);
-        console.warn(`[flux-ui] Unknown class "${cls}". ${hint}`);
+        console.warn(`[fluxnative-ui] Unknown class "${cls}". ${hint}`);
       }
     }
     return style;

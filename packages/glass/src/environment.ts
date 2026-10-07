@@ -90,7 +90,7 @@ function getSnapshot() {
 }
 
 /**
- * Set by a navigator integration (e.g. `@flux-ui/core/expo-router`) when it
+ * Set by a navigator integration (e.g. `@fluxnative/ui/expo-router`) when it
  * renders bars as native system bars. Off by default: a plain `<AppBar>`
  * draws its own glass.
  */

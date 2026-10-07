@@ -1,6 +1,6 @@
 # Glass
 
-Flux UI chrome is always glass. A surface's **tier** depends on the device and the user's settings. App code never chooses it.
+FluxNative UI chrome is always glass. A surface's **tier** depends on the device and the user's settings. App code never chooses it.
 
 | Tier | When | Rendered with |
 |---|---|---|

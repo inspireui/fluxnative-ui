@@ -5,7 +5,7 @@
 import React, { type ReactNode } from 'react';
 import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
-import { NativeBarContext, useGlassEnvironment } from '@flux-ui/glass';
+import { NativeBarContext, useGlassEnvironment } from '@fluxnative/glass';
 import { ChromeHostProvider, type NativeHeaderProps } from '../provider.tsx';
 
 function NativeHeader({ title, largeTitle, leading, trailing }: NativeHeaderProps) {

@@ -1,13 +1,13 @@
 // The floating glass tab bar drawn on every tier below `native-bar` (Android,
 // web, the Flux WebView, iOS without a native tab navigator). On iOS with
-// `FluxTabs` from `@flux-ui/core/expo-router`, the system tab bar is used
+// `FluxTabs` from `@fluxnative/ui/expo-router`, the system tab bar is used
 // instead and this component never renders.
 
 import React, { createContext, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { chrome, text } from '@flux-ui/tokens';
-import { GlassSurface, type GlassTier, type GlassVariant } from '@flux-ui/glass';
+import { chrome, text } from '@fluxnative/tokens';
+import { GlassSurface, type GlassTier, type GlassVariant } from '@fluxnative/glass';
 import { usePalette } from './provider.tsx';
 
 export interface TabBarItem {

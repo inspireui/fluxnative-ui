@@ -1,7 +1,7 @@
 // Resolves a Tailwind class string to a React Native style object at runtime,
 // for hosts with no build step (the Flux WebView, Snack). On Expo, Uniwind
 // compiles the same classes; this file accepts the same contract: Tailwind v4
-// names for layout, spacing, radius and type, and Flux UI semantic colors
+// names for layout, spacing, radius and type, and FluxNative UI semantic colors
 // only (no `bg-blue-500`, no arbitrary `[...]` values).
 //
 // Every class it can't read lands in `unknown` with a hint, so a dev warning
@@ -14,7 +14,7 @@ import {
   spacingUnit,
   text as textSizes,
   type ColorScheme,
-} from '@flux-ui/tokens';
+} from '@fluxnative/tokens';
 
 export type Platform = 'ios' | 'android' | 'web';
 
@@ -214,9 +214,9 @@ function color(name: string, scheme: ColorScheme): string | undefined {
 function hintFor(cls: string): string {
   if (cls.includes('[')) return 'Arbitrary values are not allowed. Use a token class or `unsafeStyle`.';
   if (/^(bg|text|border)-[a-z]+-\d{2,3}$/.test(cls)) {
-    return `Palette colors don't exist in Flux UI. Use a semantic color: ${[...COLOR_NAMES].filter((c) => !c.startsWith('glass')).join(', ')}.`;
+    return `Palette colors don't exist in FluxNative UI. Use a semantic color: ${[...COLOR_NAMES].filter((c) => !c.startsWith('glass')).join(', ')}.`;
   }
-  return 'Not a Flux UI class. See AGENTS.md for the supported set.';
+  return 'Not a FluxNative UI class. See AGENTS.md for the supported set.';
 }
 
 /** Reads one class (variant already stripped). Returns undefined when unknown. */

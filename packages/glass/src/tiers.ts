@@ -1,10 +1,10 @@
-// The glass ladder. Flux UI chrome is always glass by intent; what the
+// The glass ladder. FluxNative UI chrome is always glass by intent; what the
 // device can actually draw decides the tier. There is deliberately no
 // "glass off" input: only the platform and the user's accessibility
 // settings move a surface down the ladder.
 //
 //   native-bar    the system bar itself (UINavigationBar / UITabBar on iOS 26+);
-//                 Flux UI draws no background and the OS owns glass + a11y
+//                 FluxNative UI draws no background and the OS owns glass + a11y
 //   native-glass  a custom surface rendered with UIGlassEffect
 //   blur          a blur view (iOS < 26, web backdrop-filter, Android 12+)
 //   translucent   a tinted fill with a rim and a specular highlight

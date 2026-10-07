@@ -33,8 +33,8 @@ These are the only colors:
 ## In JavaScript
 
 ```ts
-import { usePalette } from '@flux-ui/core';
-import { radius, text, duration } from '@flux-ui/tokens';
+import { usePalette } from '@fluxnative/ui';
+import { radius, text, duration } from '@fluxnative/tokens';
 const palette = usePalette(); // the current scheme's colors
 ```
 

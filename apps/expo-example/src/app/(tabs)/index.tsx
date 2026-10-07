@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { AppBar, Screen, usePalette } from '@flux-ui/core';
+import { AppBar, Screen, usePalette } from '@fluxnative/ui';
 import { Glyph } from '../../components/Glyph';
 import { STORIES } from '../../data/stories';
 

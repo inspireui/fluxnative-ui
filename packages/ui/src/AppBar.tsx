@@ -14,8 +14,8 @@
 import React, { Children, isValidElement, useEffect, type ReactElement, type ReactNode } from 'react';
 import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { chrome, text } from '@flux-ui/tokens';
-import { GlassSurface, useGlassTier, type GlassTier, type GlassVariant } from '@flux-ui/glass';
+import { chrome, text } from '@fluxnative/tokens';
+import { GlassSurface, useGlassTier, type GlassTier, type GlassVariant } from '@fluxnative/glass';
 import { useChromeHost, usePalette } from './provider.tsx';
 import { TOP_CHROME, useScreen } from './Screen.tsx';
 

@@ -13,8 +13,8 @@ src/
 ```tsx
 // src/app/_layout.tsx
 import '../global.css';
-import '@flux-ui/glass/expo';
-import { FluxStack } from '@flux-ui/core/expo-router';
+import '@fluxnative/glass/expo';
+import { FluxStack } from '@fluxnative/ui/expo-router';
 
 export default function RootLayout() {
   return (
@@ -28,7 +28,7 @@ export default function RootLayout() {
 
 ```tsx
 // src/app/(tabs)/_layout.tsx
-import { FluxTabs } from '@flux-ui/core/expo-router';
+import { FluxTabs } from '@fluxnative/ui/expo-router';
 
 export default function TabsLayout() {
   return (
@@ -44,9 +44,9 @@ export default function TabsLayout() {
 
 | | iOS | Android, web |
 |---|---|---|
-| `FluxTabs` | System tab bar (`NativeTabs`): Liquid Glass, minimize on scroll, search role | Flux UI floating glass `TabBar` |
-| `AppBar` in a `FluxStack` screen | System navigation bar, large titles, native back button | Flux UI glass `AppBar` |
-| `AppBar` in a tab screen | Flux UI glass `AppBar` (wrap the tab in its own `FluxStack` for the system bar) | Flux UI glass `AppBar` |
+| `FluxTabs` | System tab bar (`NativeTabs`): Liquid Glass, minimize on scroll, search role | FluxNative UI floating glass `TabBar` |
+| `AppBar` in a `FluxStack` screen | System navigation bar, large titles, native back button | FluxNative UI glass `AppBar` |
+| `AppBar` in a tab screen | FluxNative UI glass `AppBar` (wrap the tab in its own `FluxStack` for the system bar) | FluxNative UI glass `AppBar` |
 
 ## Rules
 

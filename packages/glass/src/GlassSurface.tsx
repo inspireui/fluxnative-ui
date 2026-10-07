@@ -8,7 +8,7 @@
 
 import React, { createContext, useContext, type ReactNode } from 'react';
 import { StyleSheet, View, useColorScheme, type StyleProp, type ViewStyle } from 'react-native';
-import { colors, glass as glassTokens } from '@flux-ui/tokens';
+import { colors, glass as glassTokens } from '@fluxnative/tokens';
 import { getGlassAdapter, type GlassVariant } from './adapter.ts';
 import { useGlassEnvironment } from './environment.ts';
 import { resolveGlassTier, type GlassRole, type GlassTier } from './tiers.ts';

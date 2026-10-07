@@ -1,11 +1,11 @@
 // App-wide settings: which engine reads `className`, and which native chrome
 // a navigator integration can host. Everything has a working default, so
-// `<FluxUIProvider>` is optional on Expo + Uniwind.
+// `<FluxNativeProvider>` is optional on Expo + Uniwind.
 
 import React, { createContext, useContext, type ComponentType, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
-import { colors, type ColorScheme } from '@flux-ui/tokens';
-import { useClassStyle } from '@flux-ui/tw-runtime';
+import { colors, type ColorScheme } from '@fluxnative/tokens';
+import { useClassStyle } from '@fluxnative/tw-runtime';
 
 /**
  * `uniwind`: classes compile at build time (Expo); components pass
@@ -28,7 +28,7 @@ interface ChromeHost {
 const EngineContext = createContext<StyleEngine>('uniwind');
 const ChromeHostContext = createContext<ChromeHost>({});
 
-export function FluxUIProvider({
+export function FluxNativeProvider({
   styleEngine = 'uniwind',
   children,
 }: {

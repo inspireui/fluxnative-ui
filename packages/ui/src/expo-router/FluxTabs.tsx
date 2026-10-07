@@ -1,4 +1,4 @@
-// Android and web: Flux UI's floating glass TabBar over the JS tab
+// Android and web: FluxNative UI's floating glass TabBar over the JS tab
 // navigator. (iOS resolves FluxTabs.ios.tsx and uses the system tab bar.)
 
 import React from 'react';

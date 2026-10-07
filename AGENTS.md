@@ -1,13 +1,13 @@
-# Working in the Flux UI repo
+# Working in the FluxNative UI repo
 
-This file is for agents changing Flux UI itself. The index that ships to *apps using* Flux UI is `docs/llm/AGENTS.index.md`, and it must stay under 8 KB.
+This file is for agents changing FluxNative UI itself. The index that ships to *apps using* FluxNative UI is `docs/llm/AGENTS.index.md`, and it must stay under 8 KB.
 
 ## Layout
 
 - `packages/tokens/tokens/*.tokens.json` is the only place a design value is defined. After any change, run `pnpm tokens`; it regenerates `src/generated/*` and `apps/expo-example/src/global.css`. Never edit generated files.
 - `packages/glass`: the ladder (`tiers.ts`, pure and tested), adapters, `GlassSurface`.
-- `packages/core`: components. `src/expo-router/*` is the only code that imports `expo-router`.
-- `packages/tw-runtime`: the runtime class resolver. It must accept exactly what Uniwind accepts under the Flux UI theme. Add a test for every class family.
+- `packages/ui`: components. `src/expo-router/*` is the only code that imports `expo-router`.
+- `packages/tw-runtime`: the runtime class resolver. It must accept exactly what Uniwind accepts under the FluxNative UI theme. Add a test for every class family.
 
 ## Rules
 

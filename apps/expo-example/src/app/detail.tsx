@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { AppBar, Glass, Screen } from '@flux-ui/core';
+import { AppBar, Glass, Screen } from '@fluxnative/ui';
 import { STORIES } from '../data/stories';
 
 export default function Detail() {

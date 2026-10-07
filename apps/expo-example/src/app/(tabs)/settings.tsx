@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Platform, Text, View } from 'react-native';
-import { AppBar, Glass, Screen, useGlassTier, usePalette, type GlassTier } from '@flux-ui/core';
+import { AppBar, Glass, Screen, useGlassTier, usePalette, type GlassTier } from '@fluxnative/ui';
 
 /** The tiers a custom surface can take (native-bar belongs to navigators). */
 const SURFACE_TIERS: GlassTier[] = ['native-glass', 'blur', 'translucent', 'opaque'];

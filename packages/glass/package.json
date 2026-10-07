@@ -1,15 +1,15 @@
 {
-  "name": "@flux-ui/glass",
+  "name": "@fluxnative/glass",
   "version": "0.0.0",
-  "description": "The Flux UI glass ladder: native Liquid Glass, blur, translucent or opaque — chosen per device and accessibility settings.",
+  "description": "The FluxNative UI glass ladder: native Liquid Glass, blur, translucent or opaque — chosen per device and accessibility settings.",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inspireui/flux-ui.git",
+    "url": "git+https://github.com/inspireui/fluxnative-ui.git",
     "directory": "packages/glass"
   },
-  "homepage": "https://github.com/inspireui/flux-ui#readme",
-  "bugs": "https://github.com/inspireui/flux-ui/issues",
+  "homepage": "https://github.com/inspireui/fluxnative-ui#readme",
+  "bugs": "https://github.com/inspireui/fluxnative-ui/issues",
   "type": "module",
   "main": "src/index.ts",
   "react-native": "src/index.ts",
@@ -29,7 +29,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@flux-ui/tokens": "workspace:*"
+    "@fluxnative/tokens": "workspace:*"
   },
   "peerDependencies": {
     "expo-blur": ">=57",

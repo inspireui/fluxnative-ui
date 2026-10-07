@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, View } from 'react-native';
-import { AppBar, Screen } from '@flux-ui/core';
+import { AppBar, Screen } from '@fluxnative/ui';
 import { STORIES } from '../../data/stories';
 
 export default function Library() {

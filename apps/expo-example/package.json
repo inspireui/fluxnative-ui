@@ -1,5 +1,5 @@
 {
-  "name": "flux-ui-expo-example",
+  "name": "fluxnative-ui-expo-example",
   "private": true,
   "version": "0.0.0",
   "main": "expo-router/entry",
@@ -12,9 +12,9 @@
     "export:web": "expo export --platform web"
   },
   "dependencies": {
-    "@flux-ui/core": "workspace:*",
-    "@flux-ui/glass": "workspace:*",
-    "@flux-ui/tokens": "workspace:*",
+    "@fluxnative/glass": "workspace:*",
+    "@fluxnative/tokens": "workspace:*",
+    "@fluxnative/ui": "workspace:*",
     "expo": "~57.0.27",
     "expo-blur": "~57.0.3",
     "expo-glass-effect": "~57.0.4",
@@ -25,13 +25,16 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
+    "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
     "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.10.1",
     "tailwindcss": "^4.3.3",
     "uniwind": "^1.12.2"
   },
   "devDependencies": {
+    "@react-native/metro-config": "0.86.3",
     "@types/react": "~19.2.2",
     "typescript": "~6.0.3"
   }

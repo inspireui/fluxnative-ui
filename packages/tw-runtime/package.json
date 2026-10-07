@@ -1,15 +1,15 @@
 {
-  "name": "@flux-ui/tw-runtime",
+  "name": "@fluxnative/tw-runtime",
   "version": "0.0.0",
-  "description": "Runtime Tailwind class resolver for Flux UI hosts with no build step (Flux WebView, Snack).",
+  "description": "Runtime Tailwind class resolver for FluxNative UI hosts with no build step (Flux WebView, Snack).",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inspireui/flux-ui.git",
+    "url": "git+https://github.com/inspireui/fluxnative-ui.git",
     "directory": "packages/tw-runtime"
   },
-  "homepage": "https://github.com/inspireui/flux-ui#readme",
-  "bugs": "https://github.com/inspireui/flux-ui/issues",
+  "homepage": "https://github.com/inspireui/fluxnative-ui#readme",
+  "bugs": "https://github.com/inspireui/fluxnative-ui/issues",
   "type": "module",
   "main": "src/index.ts",
   "react-native": "src/index.ts",
@@ -23,7 +23,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@flux-ui/tokens": "workspace:*"
+    "@fluxnative/tokens": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=19",

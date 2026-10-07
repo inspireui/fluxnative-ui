@@ -1,4 +1,4 @@
-// `import '@flux-ui/glass/expo'` once, in app/_layout.tsx: registers
+// `import '@fluxnative/glass/expo'` once, in app/_layout.tsx: registers
 // expo-glass-effect (native Liquid Glass, iOS 26+) and expo-blur (iOS < 26,
 // web) as the glass adapter.
 //
@@ -10,7 +10,7 @@ import React from 'react';
 import { Platform, View, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { GlassContainer, GlassView, isGlassEffectAPIAvailable, isLiquidGlassAvailable } from 'expo-glass-effect';
-import { colors } from '@flux-ui/tokens';
+import { colors } from '@fluxnative/tokens';
 import { registerGlassAdapter, type BlurProps, type NativeGlassGroupProps, type NativeGlassProps } from './adapter.ts';
 
 function NativeGlass({ variant, tintColor, interactive = false, colorScheme, style }: NativeGlassProps) {

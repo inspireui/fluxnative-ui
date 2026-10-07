@@ -1,5 +1,5 @@
 {
-  "$description": "Flux UI base tokens. Spacing, radius and type mirror the Tailwind CSS v4 default scale on purpose: models already write `p-4`, `rounded-xl`, `text-lg`, so Flux UI keeps those names and values. Do not rename them.",
+  "$description": "FluxNative UI base tokens. Spacing, radius and type mirror the Tailwind CSS v4 default scale on purpose: models already write `p-4`, `rounded-xl`, `text-lg`, so FluxNative UI keeps those names and values. Do not rename them.",
   "spacing": {
     "$type": "dimension",
     "$description": "Tailwind v4 dynamic spacing: `p-<n>` = n × unit, for any n that is a multiple of 0.25.",

@@ -1,7 +1,7 @@
 // A small reader for the W3C Design Tokens Format (DTCG 2025.10): walks
 // groups, inherits `$type` from the nearest group, resolves `{a.b}` aliases
 // and normalises each value to the plain number or string a React Native
-// style can take. It reads only the types Flux UI uses and throws on any
+// style can take. It reads only the types FluxNative UI uses and throws on any
 // other, so a token file can't silently produce nothing.
 
 export type TokenType =

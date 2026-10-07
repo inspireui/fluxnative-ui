@@ -1,5 +1,5 @@
 // A glass adapter is how a host plugs real materials into the ladder.
-// `@flux-ui/glass/expo` registers expo-glass-effect + expo-blur; the Flux
+// `@fluxnative/glass/expo` registers expo-glass-effect + expo-blur; the Flux
 // WebView host registers a backdrop-filter one through `flux/glass`. With no
 // adapter registered, every custom surface lands on `translucent` or
 // `opaque`, which need nothing but View.

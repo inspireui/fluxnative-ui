@@ -10,7 +10,7 @@ const config = getDefaultConfig(__dirname);
 const fromCwd = (file) => path.relative(process.cwd(), path.join(__dirname, file));
 
 // Uniwind must be the outermost wrapper. global.css is generated from the
-// Flux UI tokens: run `pnpm tokens` at the repo root after changing them.
+// FluxNative UI tokens: run `pnpm tokens` at the repo root after changing them.
 module.exports = withUniwindConfig(config, {
   cssEntryFile: fromCwd('src/global.css'),
   dtsFile: fromCwd('src/uniwind-types.d.ts'),

@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "Flux UI",
-    "slug": "flux-ui-example",
-    "scheme": "fluxui",
+    "name": "FluxNative UI",
+    "slug": "fluxnative-ui-example",
+    "scheme": "fluxnativeui",
     "version": "0.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.fluxstore.fluxui.example",
+      "bundleIdentifier": "com.inspireui.fluxnativeui.example",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.fluxstore.fluxui.example",
+      "package": "com.inspireui.fluxnativeui.example",
       "edgeToEdgeEnabled": true
     },
     "web": {
