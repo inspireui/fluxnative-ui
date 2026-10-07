@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Flux UI",
+    "slug": "flux-ui-example",
+    "scheme": "fluxui",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "bundleIdentifier": "com.fluxstore.fluxui.example",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.fluxstore.fluxui.example",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "./plugins/withSceneLifecycle"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

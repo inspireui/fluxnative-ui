@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.turbo/
+.expo/
+ios/
+android/
+*.tsbuildinfo
+.DS_Store
+dist-web/
+expo-env.d.ts
+.claude/

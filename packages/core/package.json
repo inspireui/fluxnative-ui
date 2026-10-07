@@ -1,0 +1,52 @@
+{
+  "name": "@flux-ui/core",
+  "version": "0.0.0",
+  "description": "Flux UI: React Native components with always-on Liquid Glass navigation chrome, styled with Tailwind v4 classes.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inspireui/flux-ui.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/inspireui/flux-ui#readme",
+  "bugs": "https://github.com/inspireui/flux-ui/issues",
+  "type": "module",
+  "main": "src/index.ts",
+  "react-native": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./expo-router": "./src/expo-router/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@flux-ui/glass": "workspace:*",
+    "@flux-ui/tokens": "workspace:*",
+    "@flux-ui/tw-runtime": "workspace:*"
+  },
+  "peerDependencies": {
+    "expo-router": ">=57",
+    "react": ">=19",
+    "react-native": ">=0.84",
+    "react-native-safe-area-context": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "expo-router": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "expo-router": "~57.0.25",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "typescript": "~6.0.3"
+  }
+}

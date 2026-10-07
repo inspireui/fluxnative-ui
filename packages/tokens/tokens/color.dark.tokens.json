@@ -1,0 +1,299 @@
+{
+  "$description": "Flux UI semantic colors \u2014 dark scheme. Names follow shadcn/ui so models already know them.",
+  "color": {
+    "$type": "color",
+    "background": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0,
+          0,
+          0
+        ],
+        "hex": "#000000"
+      }
+    },
+    "foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9608,
+          0.9608,
+          0.9686
+        ],
+        "hex": "#f5f5f7"
+      }
+    },
+    "card": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1098,
+          0.1098,
+          0.1176
+        ],
+        "hex": "#1c1c1e"
+      }
+    },
+    "card-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9608,
+          0.9608,
+          0.9686
+        ],
+        "hex": "#f5f5f7"
+      }
+    },
+    "popover": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1725,
+          0.1725,
+          0.1804
+        ],
+        "hex": "#2c2c2e"
+      }
+    },
+    "popover-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9608,
+          0.9608,
+          0.9686
+        ],
+        "hex": "#f5f5f7"
+      }
+    },
+    "primary": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0392,
+          0.5176,
+          1
+        ],
+        "hex": "#0a84ff"
+      }
+    },
+    "primary-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff"
+      }
+    },
+    "secondary": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1725,
+          0.1725,
+          0.1804
+        ],
+        "hex": "#2c2c2e"
+      }
+    },
+    "secondary-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9608,
+          0.9608,
+          0.9686
+        ],
+        "hex": "#f5f5f7"
+      }
+    },
+    "muted": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1098,
+          0.1098,
+          0.1176
+        ],
+        "hex": "#1c1c1e"
+      }
+    },
+    "muted-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5961,
+          0.5961,
+          0.6235
+        ],
+        "hex": "#98989f"
+      }
+    },
+    "accent": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1725,
+          0.1725,
+          0.1804
+        ],
+        "hex": "#2c2c2e"
+      }
+    },
+    "accent-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9608,
+          0.9608,
+          0.9686
+        ],
+        "hex": "#f5f5f7"
+      }
+    },
+    "destructive": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          0.2706,
+          0.2275
+        ],
+        "hex": "#ff453a"
+      }
+    },
+    "success": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1882,
+          0.8196,
+          0.3451
+        ],
+        "hex": "#30d158"
+      }
+    },
+    "warning": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          0.6235,
+          0.0392
+        ],
+        "hex": "#ff9f0a"
+      }
+    },
+    "border": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3294,
+          0.3294,
+          0.3451
+        ],
+        "hex": "#545458",
+        "alpha": 0.6
+      }
+    },
+    "input": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3294,
+          0.3294,
+          0.3451
+        ],
+        "hex": "#545458",
+        "alpha": 0.6
+      }
+    },
+    "ring": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0392,
+          0.5176,
+          1
+        ],
+        "hex": "#0a84ff"
+      }
+    },
+    "scrim": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0,
+          0,
+          0
+        ],
+        "hex": "#000000",
+        "alpha": 0.55
+      }
+    },
+    "glass-fill": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1176,
+          0.1176,
+          0.1255
+        ],
+        "hex": "#1e1e20",
+        "alpha": 0.72
+      }
+    },
+    "glass-blur-fill": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1176,
+          0.1176,
+          0.1255
+        ],
+        "hex": "#1e1e20",
+        "alpha": 0.45
+      }
+    },
+    "glass-border": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff",
+        "alpha": 0.14
+      }
+    },
+    "glass-highlight": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff",
+        "alpha": 0.16
+      }
+    },
+    "glass-opaque": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.1098,
+          0.1098,
+          0.1176
+        ],
+        "hex": "#1c1c1e"
+      }
+    }
+  }
+}

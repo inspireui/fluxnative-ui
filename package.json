@@ -1,0 +1,22 @@
+{
+  "name": "flux-ui-monorepo",
+  "private": true,
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "tokens": "node packages/tokens/src/build.ts --global-css apps/expo-example/src/global.css",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "changeset": "changeset",
+    "release": "turbo run build && changeset publish",
+    "tokens:check": "node packages/tokens/src/build.ts --check --global-css apps/expo-example/src/global.css"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.0",
+    "turbo": "^2.5.0",
+    "typescript": "~6.0.3"
+  }
+}
