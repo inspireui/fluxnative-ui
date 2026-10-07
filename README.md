@@ -90,4 +90,4 @@ pnpm --filter flux-ui-expo-example ios
 
 ## License
 
-MIT © FluxStore and the Flux UI contributors.
+MIT © InspireUI and the Flux UI contributors.
