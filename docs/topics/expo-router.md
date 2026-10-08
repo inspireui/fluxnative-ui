@@ -33,8 +33,9 @@ import { FluxTabs } from '@fluxnative/ui/expo-router';
 export default function TabsLayout() {
   return (
     <FluxTabs minimize="onScrollDown">
-      <FluxTabs.Tab name="index" label="Home" sf="house" icon={({ color }) => <HomeIcon color={color} />} />
-      <FluxTabs.Tab name="search" label="Search" sf="magnifyingglass" role="search" icon={…} />
+      <FluxTabs.Tab name="index" label="Home" iconName="home" />
+      <FluxTabs.Tab name="search" label="Search" iconName="search" role="search" />
+      <FluxTabs.Tab name="you" label="You" sf="person.crop.circle" icon={({ color }) => <Avatar color={color} />} />
     </FluxTabs>
   );
 }
@@ -50,6 +51,7 @@ export default function TabsLayout() {
 
 ## Rules
 
-- Pass `onBack={router.back}` on pushed screens. iOS ignores it and keeps the system back button and swipe.
-- `sf` names an SF Symbol and is used only on iOS. `icon` is used everywhere else. Give both.
+- Pass `onBack={router.back}` on pushed screens. iOS ignores it and keeps the system back button and swipe. `backLabel` names the back control for screen readers on the other platforms.
+- `iconName` is one name from the `@fluxnative/icons` table and covers every platform: the SF Symbol on iOS, the SVG glyph (filled when focused) on Android and web. `sf` (iOS) and `icon` (Android, web) override it per platform; a tab with neither and no `iconName` has no icon.
+- `minimize` and `role="search"` are iOS 26+ only. Android and web ignore them (see `docs/topics/android.md`).
 - `Screen` already pads content clear of the bars. Don't add safe-area padding yourself.

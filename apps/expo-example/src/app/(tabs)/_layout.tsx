@@ -18,12 +18,8 @@ export default function TabsLayout() {
         icon={({ color }) => <Glyph name="library" color={color} />}
         badge={3}
       />
-      <FluxTabs.Tab
-        name="settings"
-        label="Settings"
-        sf="gearshape"
-        icon={({ color }) => <Glyph name="settings" color={color} />}
-      />
+      {/* One name from the icon table covers iOS (SF Symbol) and Android/web (SVG). */}
+      <FluxTabs.Tab name="settings" label="Settings" iconName="settings" />
     </FluxTabs>
   );
 }
