@@ -21,23 +21,54 @@ export type Platform = 'ios' | 'android' | 'web';
 export interface ResolveOptions {
   scheme: ColorScheme;
   platform: Platform;
+  /** Window size for `w-screen` / `h-screen`. `useClassStyle` passes `useWindowDimensions()`. */
+  window?: { width: number; height: number };
 }
 
-export type Style = Record<string, string | number | string[]>;
+/** One entry of a React Native `transform` array, e.g. `{ rotate: '45deg' }`. */
+export type Transform = Record<string, string | number>;
+export type StyleValue = string | number | string[] | { width: number; height: number } | Transform[];
+export type Style = Record<string, StyleValue>;
 
 export interface Resolved {
   style: Style;
   unknown: Array<{ className: string; hint: string }>;
 }
 
+/** What one class contributes. `undefined` unsets a property (`max-w-none`). */
+type Read = Record<string, StyleValue | undefined>;
+
+const BLACK = '#000000';
 const COLOR_NAMES = new Set(Object.keys(colors.light));
 const STATIC_COLORS: Record<string, string> = {
   white: '#ffffff',
-  black: '#000000',
+  black: BLACK,
   transparent: 'transparent',
 };
 
 const VARIANTS = new Set(['dark', 'light', 'ios', 'android', 'web']);
+
+const BORDER_SIDES: Record<string, string[]> = {
+  '': ['borderWidth'],
+  x: ['borderLeftWidth', 'borderRightWidth'],
+  y: ['borderTopWidth', 'borderBottomWidth'],
+  t: ['borderTopWidth'],
+  b: ['borderBottomWidth'],
+  l: ['borderLeftWidth'],
+  r: ['borderRightWidth'],
+};
+
+/** `border`, `border-x`, `border-y-2`, `border-t-0` … for the Tailwind widths 0, 1 (bare), 2, 4, 8. */
+function borderWidths(): Record<string, Style> {
+  const out: Record<string, Style> = {};
+  for (const [side, props] of Object.entries(BORDER_SIDES)) {
+    for (const width of [0, 1, 2, 4, 8]) {
+      const name = ['border', side, width === 1 ? '' : String(width)].filter(Boolean).join('-');
+      out[name] = Object.fromEntries(props.map((p) => [p, width]));
+    }
+  }
+  return out;
+}
 
 const STATIC: Record<string, Style> = {
   flex: { display: 'flex' },
@@ -100,14 +131,7 @@ const STATIC: Record<string, Style> = {
   'line-through': { textDecorationLine: 'line-through' },
   'no-underline': { textDecorationLine: 'none' },
   'tabular-nums': { fontVariant: ['tabular-nums'] },
-  border: { borderWidth: 1 },
-  'border-0': { borderWidth: 0 },
-  'border-2': { borderWidth: 2 },
-  'border-4': { borderWidth: 4 },
-  'border-t': { borderTopWidth: 1 },
-  'border-b': { borderBottomWidth: 1 },
-  'border-l': { borderLeftWidth: 1 },
-  'border-r': { borderRightWidth: 1 },
+  ...borderWidths(),
   'border-solid': { borderStyle: 'solid' },
   'border-dashed': { borderStyle: 'dashed' },
   'border-dotted': { borderStyle: 'dotted' },
@@ -156,6 +180,21 @@ const SPACING_PROPS: Record<string, string[]> = {
 // Longest prefix first, so `gap-x-2` isn't read as `gap` + `x-2`.
 const SPACING_PREFIXES = Object.keys(SPACING_PROPS).sort((a, b) => b.length - a.length);
 
+/** Tailwind v4 `--container-*` widths, in px. `max-w-none` and `max-w-full` are handled separately. */
+const NAMED_MAX_WIDTHS: Record<string, number> = {
+  xs: 320,
+  sm: 384,
+  md: 448,
+  lg: 512,
+  xl: 576,
+  '2xl': 672,
+  '3xl': 768,
+  '4xl': 896,
+  '5xl': 1024,
+  '6xl': 1152,
+  '7xl': 1280,
+};
+
 const RADIUS_SIDES: Record<string, string[]> = {
   '': ['borderRadius'],
   t: ['borderTopLeftRadius', 'borderTopRightRadius'],
@@ -174,6 +213,54 @@ const COLOR_PROPS: Record<string, string> = {
   border: 'borderColor',
 };
 
+// Tailwind v4 `--shadow-*`: the first (largest) layer of each, as iOS shadow
+// props, plus an Android elevation of similar depth.
+const SHADOWS: Record<string, { height: number; radius: number; opacity: number; elevation: number }> = {
+  '2xs': { height: 1, radius: 0, opacity: 0.05, elevation: 1 },
+  xs: { height: 1, radius: 2, opacity: 0.05, elevation: 1 },
+  sm: { height: 1, radius: 3, opacity: 0.1, elevation: 2 },
+  DEFAULT: { height: 1, radius: 3, opacity: 0.1, elevation: 3 },
+  md: { height: 4, radius: 6, opacity: 0.1, elevation: 4 },
+  lg: { height: 10, radius: 15, opacity: 0.1, elevation: 8 },
+  xl: { height: 20, radius: 25, opacity: 0.1, elevation: 12 },
+  '2xl': { height: 25, radius: 50, opacity: 0.25, elevation: 16 },
+  none: { height: 0, radius: 0, opacity: 0, elevation: 0 },
+};
+
+/** Unitless line heights; multiplied by the font size. */
+const LEADING: Record<string, number> = {
+  none: 1,
+  tight: 1.25,
+  snug: 1.375,
+  normal: 1.5,
+  relaxed: 1.625,
+  loose: 2,
+};
+
+/** Letter spacing in em; multiplied by the font size. */
+const TRACKING: Record<string, number> = {
+  tighter: -0.05,
+  tight: -0.025,
+  normal: 0,
+  wide: 0.025,
+  wider: 0.05,
+  widest: 0.1,
+};
+
+/** CSS applies `translate`, then `rotate`, then `scale`; the merged array keeps that order. */
+const TRANSFORM_ORDER = ['translateX', 'translateY', 'rotate', 'scale', 'scaleX', 'scaleY'];
+const TRANSFORM_PROPS: Record<string, string> = {
+  'translate-x': 'translateX',
+  'translate-y': 'translateY',
+  rotate: 'rotate',
+  scale: 'scale',
+  'scale-x': 'scaleX',
+  'scale-y': 'scaleY',
+};
+
+/** Font size when the class string has no `text-*` size, as in CSS. */
+const BASE_FONT_SIZE = 16;
+
 /** `4` → 16, `0.5` → 2, `px` → 1. Undefined when not a Tailwind spacing step. */
 function spacing(value: string): number | string | undefined {
   if (value === 'px') return 1;
@@ -186,6 +273,11 @@ function spacing(value: string): number | string | undefined {
   // Tailwind v4 only accepts multiples of 0.25.
   if (!Number.isInteger(n * 4)) return undefined;
   return n * spacingUnit;
+}
+
+/** Trims float noise such as `0.1 * 15 = 1.5000000000000002`. */
+function round(n: number): number {
+  return Math.round(n * 1000) / 1000;
 }
 
 /** `#rrggbb` + `/50` → `rgba(…, 0.5)`. */
@@ -216,16 +308,59 @@ function hintFor(cls: string): string {
   if (/^(bg|text|border)-[a-z]+-\d{2,3}$/.test(cls)) {
     return `Palette colors don't exist in FluxNative UI. Use a semantic color: ${[...COLOR_NAMES].filter((c) => !c.startsWith('glass')).join(', ')}.`;
   }
+  const clamp = /^line-clamp-(.+)$/.exec(cls)?.[1];
+  if (clamp !== undefined) return `\`line-clamp-*\` is a Text prop: use \`numberOfLines={${/^\d+$/.test(clamp) ? clamp : 'n'}}\`.`;
+  if (cls === 'w-screen' || cls === 'h-screen') {
+    return '`w-screen` / `h-screen` need the window size: pass `window` to `resolve()` (`useClassStyle` passes `useWindowDimensions()`).';
+  }
   return 'Not a FluxNative UI class. See AGENTS.md for the supported set.';
 }
 
+function variantHint(variant: string): string {
+  if (variant === 'active') return "`active:` has no runtime equivalent: use Pressable's `style={({pressed}) => …}`.";
+  return `Variant "${variant}:" is not supported. Use: ${[...VARIANTS].join(', ')}.`;
+}
+
+/** `translate-x-2` → `{ translateX: 8 }`, `-rotate-90` → `{ rotate: '-90deg' }`, `scale-110` → `{ scale: 1.1 }`. */
+function transform(body: string, negative: boolean): Transform | undefined {
+  const match = /^(translate-x|translate-y|rotate|scale-x|scale-y|scale)-(.+)$/.exec(body);
+  const kind = match?.[1];
+  const raw = match?.[2];
+  const prop = kind === undefined ? undefined : TRANSFORM_PROPS[kind];
+  if (kind === undefined || raw === undefined || prop === undefined) return undefined;
+  if (kind === 'rotate') return /^\d+$/.test(raw) ? { [prop]: `${negative ? '-' : ''}${raw}deg` } : undefined;
+  if (kind.startsWith('scale')) return !negative && /^\d+$/.test(raw) ? { [prop]: Number(raw) / 100 } : undefined;
+  const value = spacing(raw);
+  if (value === undefined || value === 'auto') return undefined;
+  if (!negative) return { [prop]: value };
+  return { [prop]: typeof value === 'number' ? -value : `-${value}` };
+}
+
+interface Context {
+  scheme: ColorScheme;
+  /** Font size of the `text-*` class in the same string, for `leading-*` and `tracking-*`. */
+  fontSize: number;
+  window: ResolveOptions['window'];
+}
+
 /** Reads one class (variant already stripped). Returns undefined when unknown. */
-function readClass(cls: string, scheme: ColorScheme): Style | undefined {
+function readClass(cls: string, ctx: Context): Read | undefined {
   const fixed = STATIC[cls];
   if (fixed) return fixed;
 
   const negative = cls.startsWith('-');
   const body = negative ? cls.slice(1) : cls;
+
+  if (/^(translate|rotate|scale)/.test(body)) {
+    const part = transform(body, negative);
+    return part && { transform: [part] };
+  }
+
+  if (cls === 'w-screen') return ctx.window && { width: ctx.window.width };
+  if (cls === 'h-screen') return ctx.window && { height: ctx.window.height };
+  if (cls === 'max-w-none') return { maxWidth: undefined };
+  const maxWidth = /^max-w-(.+)$/.exec(cls)?.[1];
+  if (maxWidth !== undefined && maxWidth in NAMED_MAX_WIDTHS) return { maxWidth: NAMED_MAX_WIDTHS[maxWidth] };
 
   for (const prefix of SPACING_PREFIXES) {
     if (!body.startsWith(`${prefix}-`)) continue;
@@ -236,10 +371,10 @@ function readClass(cls: string, scheme: ColorScheme): Style | undefined {
   }
   if (negative) return undefined;
 
-  const round = /^rounded(?:-(t|b|l|r|tl|tr|bl|br))?(?:-(.+))?$/.exec(cls);
-  if (round) {
-    const side = round[1] ?? '';
-    const size = round[2] ?? 'DEFAULT';
+  const rounded = /^rounded(?:-(t|b|l|r|tl|tr|bl|br))?(?:-(.+))?$/.exec(cls);
+  if (rounded) {
+    const side = rounded[1] ?? '';
+    const size = rounded[2] ?? 'DEFAULT';
     const value = size === 'none' ? 0 : radii[size as keyof typeof radii];
     if (value === undefined) return undefined;
     return Object.fromEntries((RADIUS_SIDES[side] ?? []).map((p) => [p, value]));
@@ -252,7 +387,36 @@ function readClass(cls: string, scheme: ColorScheme): Style | undefined {
   }
 
   const weight = /^font-(.+)$/.exec(cls)?.[1];
-  if (weight && weight in fontWeights) return { fontWeight: fontWeights[weight as keyof typeof fontWeights] };
+  // React Native wants `fontWeight` as a string ('600'), never a number.
+  if (weight && weight in fontWeights) return { fontWeight: String(fontWeights[weight as keyof typeof fontWeights]) };
+
+  const shadow = /^shadow(?:-(.+))?$/.exec(cls);
+  if (shadow) {
+    const level = SHADOWS[shadow[1] ?? 'DEFAULT'];
+    if (level === undefined) return undefined;
+    return {
+      shadowColor: BLACK,
+      shadowOffset: { width: 0, height: level.height },
+      shadowOpacity: level.opacity,
+      shadowRadius: level.radius,
+      elevation: level.elevation,
+    };
+  }
+
+  const leading = /^leading-(.+)$/.exec(cls)?.[1];
+  if (leading !== undefined) {
+    const multiplier = LEADING[leading];
+    if (multiplier !== undefined) return { lineHeight: round(ctx.fontSize * multiplier) };
+    // `leading-3` … `leading-10` are spacing steps.
+    const step = /^\d+$/.test(leading) ? Number(leading) : NaN;
+    return step >= 3 && step <= 10 ? { lineHeight: step * spacingUnit } : undefined;
+  }
+
+  const tracking = /^tracking-(.+)$/.exec(cls)?.[1];
+  if (tracking !== undefined) {
+    const em = TRACKING[tracking];
+    return em === undefined ? undefined : { letterSpacing: round(ctx.fontSize * em) };
+  }
 
   const opacity = /^opacity-(\d+)$/.exec(cls)?.[1];
   if (opacity !== undefined) {
@@ -265,7 +429,7 @@ function readClass(cls: string, scheme: ColorScheme): Style | undefined {
 
   const colorClass = /^(bg|text|border)-(.+)$/.exec(cls);
   if (colorClass?.[1] && colorClass[2]) {
-    const value = color(colorClass[2], scheme);
+    const value = color(colorClass[2], ctx.scheme);
     if (value === undefined) return undefined;
     return { [COLOR_PROPS[colorClass[1]] ?? '']: value };
   }
@@ -276,35 +440,67 @@ function readClass(cls: string, scheme: ColorScheme): Style | undefined {
 const cache = new Map<string, Resolved>();
 
 /**
- * Resolves a class string. Later classes win, as in Tailwind source order.
+ * Resolves a class string. Later classes win, as in Tailwind source order,
+ * except that `leading-*` always wins over the line height of `text-*`, and
+ * transforms merge into one `transform` array in CSS order.
  * Variants: `dark:` / `light:` (color scheme) and `ios:` / `android:` / `web:`.
  */
 export function resolve(className: string | undefined, options: ResolveOptions): Resolved {
-  const key = `${options.scheme}|${options.platform}|${className ?? ''}`;
+  const { window } = options;
+  const key = `${options.scheme}|${options.platform}|${window ? `${window.width}x${window.height}` : ''}|${className ?? ''}`;
   const hit = cache.get(key);
   if (hit) return hit;
 
   const style: Style = {};
   const unknown: Resolved['unknown'] = [];
+
+  // First pass: variants, and the font size `leading-*` / `tracking-*` are relative to.
+  const classes: Array<{ token: string; cls: string; applies: boolean; badVariant?: string }> = [];
+  let fontSize = BASE_FONT_SIZE;
   for (const token of (className ?? '').split(/\s+/)) {
     if (!token) continue;
     const parts = token.split(':');
     const cls = parts.pop() ?? '';
     const variants = parts;
     const badVariant = variants.find((v) => !VARIANTS.has(v));
-    if (badVariant) {
-      unknown.push({ className: token, hint: `Variant "${badVariant}:" is not supported. Use: ${[...VARIANTS].join(', ')}.` });
+    const applies =
+      badVariant === undefined &&
+      variants.every((v) => (v === 'dark' || v === 'light' ? v === options.scheme : v === options.platform));
+    classes.push({ token, cls, applies, badVariant });
+    const size = /^text-(.+)$/.exec(cls)?.[1];
+    if (applies && size && size in textSizes) fontSize = textSizes[size as keyof typeof textSizes].fontSize;
+  }
+
+  // Second pass, in source order so `unknown` reads top to bottom.
+  const ctx: Context = { scheme: options.scheme, fontSize, window };
+  const transforms = new Map<string, string | number>();
+  let leading: StyleValue | undefined;
+  for (const { token, cls, applies, badVariant } of classes) {
+    if (badVariant !== undefined) {
+      unknown.push({ className: token, hint: variantHint(badVariant) });
       continue;
     }
-    const applies = variants.every((v) =>
-      v === 'dark' || v === 'light' ? v === options.scheme : v === options.platform,
-    );
-    const read = readClass(cls, options.scheme);
+    const read = readClass(cls, ctx);
     if (!read) {
       unknown.push({ className: token, hint: hintFor(cls) });
       continue;
     }
-    if (applies) Object.assign(style, read);
+    if (!applies) continue;
+    for (const [prop, value] of Object.entries(read)) {
+      if (value === undefined) delete style[prop];
+      else if (prop === 'transform' && Array.isArray(value)) {
+        for (const part of value) if (typeof part === 'object') for (const [k, v] of Object.entries(part)) transforms.set(k, v);
+      } else style[prop] = value;
+    }
+    if (cls.startsWith('leading-')) leading = read.lineHeight;
+  }
+  // Tailwind v4 sets `line-height: var(--tw-leading, …)` on `text-*`, so
+  // `leading-*` wins whichever comes first.
+  if (leading !== undefined) style.lineHeight = leading;
+  if (transforms.size > 0) {
+    style.transform = [...transforms]
+      .sort(([a], [b]) => TRANSFORM_ORDER.indexOf(a) - TRANSFORM_ORDER.indexOf(b))
+      .map(([prop, value]) => ({ [prop]: value }));
   }
 
   const result = { style, unknown };

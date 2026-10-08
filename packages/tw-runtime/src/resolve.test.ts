@@ -68,3 +68,86 @@ test('web-only variants are unknown', () => {
   const { unknown } = resolve('hover:bg-accent', light);
   assert.match(unknown[0]?.hint ?? '', /Variant "hover:"/);
 });
+
+test('shadows map to iOS shadow props plus an Android elevation', () => {
+  assert.deepEqual(resolve('shadow-md', light).style, {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+  });
+  assert.equal(resolve('shadow', light).style.elevation, 3);
+  assert.deepEqual(resolve('shadow-none', light).style, {
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
+    elevation: 0,
+  });
+  assert.equal(resolve('shadow-inner', light).unknown.length, 1);
+});
+
+test('leading-* is relative to the text-* size and wins over its line height', () => {
+  assert.deepEqual(resolve('text-lg leading-tight', light).style, { fontSize: 18, lineHeight: 22.5 });
+  assert.deepEqual(resolve('leading-tight text-lg', light).style, { fontSize: 18, lineHeight: 22.5 });
+  assert.deepEqual(resolve('leading-none', light).style, { lineHeight: 16 });
+  assert.deepEqual(resolve('leading-6', light).style, { lineHeight: 24 });
+  assert.equal(resolve('leading-huge', light).unknown.length, 1);
+});
+
+test('tracking-* is an em value of the text-* size, in px', () => {
+  assert.deepEqual(resolve('tracking-wide', light).style, { letterSpacing: 0.4 });
+  assert.equal(resolve('text-xs tracking-wider', light).style.letterSpacing, 0.6);
+  assert.equal(resolve('tracking-tighter', light).style.letterSpacing, -0.8);
+  assert.equal(resolve('tracking-huge', light).unknown.length, 1);
+});
+
+test('transforms merge into one array in CSS order', () => {
+  assert.deepEqual(resolve('translate-x-2 -translate-y-1 rotate-45 scale-110', light).style, {
+    transform: [{ translateX: 8 }, { translateY: -4 }, { rotate: '45deg' }, { scale: 1.1 }],
+  });
+  assert.deepEqual(resolve('scale-x-50 -rotate-90', light).style.transform, [{ rotate: '-90deg' }, { scaleX: 0.5 }]);
+  assert.deepEqual(resolve('-translate-x-1/2', light).style.transform, [{ translateX: '-50%' }]);
+  assert.deepEqual(resolve('rotate-45 rotate-90', light).style.transform, [{ rotate: '90deg' }]);
+  assert.equal(resolve('rotate-abc -scale-50', light).unknown.length, 2);
+});
+
+test('border-x and border-y set both sides', () => {
+  assert.deepEqual(resolve('border-x border-y-2', light).style, {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderTopWidth: 2,
+    borderBottomWidth: 2,
+  });
+});
+
+test('w-screen and h-screen read the window passed in', () => {
+  const window = { width: 390, height: 844 };
+  assert.deepEqual(resolve('w-screen h-screen', { ...light, window }).style, { width: 390, height: 844 });
+  assert.equal(resolve('w-screen', { ...light, window: { width: 1024, height: 768 } }).style.width, 1024);
+  const { style, unknown } = resolve('w-screen', light);
+  assert.deepEqual(style, {});
+  assert.match(unknown[0]?.hint ?? '', /window/);
+});
+
+test('named max-w uses the Tailwind container widths', () => {
+  assert.deepEqual(resolve('max-w-md', light).style, { maxWidth: 448 });
+  assert.deepEqual(resolve('max-w-7xl', light).style, { maxWidth: 1280 });
+  assert.deepEqual(resolve('max-w-full', light).style, { maxWidth: '100%' });
+  assert.deepEqual(resolve('max-w-md max-w-none', light).style, {});
+  assert.equal(resolve('max-w-prose', light).unknown.length, 1);
+});
+
+test('line-clamp-* and active: name the prop or Pressable API to use instead', () => {
+  const { style, unknown } = resolve('line-clamp-2 active:bg-accent', light);
+  assert.deepEqual(style, {});
+  assert.match(unknown[0]?.hint ?? '', /numberOfLines=\{2\}/);
+  assert.match(unknown[1]?.hint ?? '', /Pressable/);
+});
+
+test('font weights are strings, as React Native requires', () => {
+  const { fontWeight } = resolve('font-bold', light).style;
+  assert.equal(typeof fontWeight, 'string');
+  assert.equal(fontWeight, '700');
+});
