@@ -6,7 +6,7 @@
     "components/bridge.ts": "bfd1ef980134e6334e379371e8921eede541c9d2f98d01ca5e300c6538173618",
     "components/Button.tsx": "f2bfe7b5b4d860c6d2aaedf9ddefaaf6309d7077dd213ed321a20f29cdfd148c",
     "components/Chip.tsx": "f2da363034b71484c4f4c716ea0b4ab98f772f9722347c60afde21387dca9a32",
-    "components/Icon.tsx": "9e43eb0358347c85b2443f9ddfe0056d9474cad27dd8d0aa4bf86f716b08e636",
+    "components/Icon.tsx": "301a5dc3dd175778f344b794714bda927b5c53614afcb5b1425796e2a38bf5e4",
     "components/IconButton.tsx": "c6ed0323e54c2b63b9825629e99f99d4d0c7244d51c5033e4dfc83640bf06158",
     "components/Press.tsx": "55e2411f00ee494aac1189864c2f04309aaab62555f87d7f92e28bc7f983fde2",
     "components/Reveal.tsx": "43fbd7935c61442528e9a75a494681fb066338fbf03b7d7dcfb1a6c97b8a694c",
