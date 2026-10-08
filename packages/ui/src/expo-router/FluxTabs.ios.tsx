@@ -5,7 +5,7 @@ import React from 'react';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { NativeBarContext } from '@fluxnative/glass';
 import { ChromeHostProvider, usePalette } from '../provider.tsx';
-import { Tab, collectTabs, type FluxTabsProps } from './tabs-shared.ts';
+import { Tab, collectTabs, tabSymbol, type FluxTabsProps } from './tabs-shared.ts';
 
 const NO_HOST = {};
 
@@ -18,13 +18,16 @@ function FluxTabsRoot({ children, minimize = 'automatic' }: FluxTabsProps) {
     <NativeBarContext.Provider value={false}>
       <ChromeHostProvider value={NO_HOST}>
         <NativeTabs minimizeBehavior={minimize} tintColor={palette.primary}>
-          {tabs.map((tab) => (
+          {tabs.map((tab) => {
+            const sf = tabSymbol(tab);
+            return (
             <NativeTabs.Trigger key={tab.name} name={tab.name} role={tab.role}>
               <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
-              {tab.sf ? <NativeTabs.Trigger.Icon sf={tab.sf as never} /> : null}
+              {sf ? <NativeTabs.Trigger.Icon sf={sf as never} /> : null}
               {tab.badge !== undefined ? <NativeTabs.Trigger.Badge>{String(tab.badge)}</NativeTabs.Trigger.Badge> : null}
             </NativeTabs.Trigger>
-          ))}
+            );
+          })}
         </NativeTabs>
       </ChromeHostProvider>
     </NativeBarContext.Provider>

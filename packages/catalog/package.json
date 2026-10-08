@@ -1,0 +1,41 @@
+{
+  "name": "@fluxnative/catalog",
+  "version": "0.0.0",
+  "description": "The template layer of FluxNative UI: dependency-free React Native primitives, a closed tokens file and an icon component, emitted into a Flux template's files/ folder with a drift manifest.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inspireui/fluxnative-ui.git",
+    "directory": "packages/catalog"
+  },
+  "homepage": "https://github.com/inspireui/fluxnative-ui#readme",
+  "bugs": "https://github.com/inspireui/fluxnative-ui/issues",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "bin": {
+    "fluxnative-catalog": "src/cli.ts"
+  },
+  "files": [
+    "src",
+    "files"
+  ],
+  "scripts": {
+    "build": "node src/cli.ts build",
+    "check": "node src/cli.ts build --check",
+    "test": "node --test src/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.files.json"
+  },
+  "dependencies": {
+    "@fluxnative/icons": "workspace:*",
+    "@fluxnative/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "~19.2.2",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-svg": "15.15.4",
+    "typescript": "~6.0.3"
+  }
+}

@@ -22,7 +22,7 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Generated files are current (tokens, theme.css, glass hosts)
+      - name: Generated files are current (tokens, theme.css, glass hosts, catalog files)
         run: pnpm tokens:check
       - run: pnpm test
       - run: pnpm typecheck
