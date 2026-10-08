@@ -182,6 +182,18 @@
       },
       "$description": "Destructive action and errors."
     },
+    "destructive-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff"
+      },
+      "$description": "Text and icons on a destructive fill (badges, danger buttons)."
+    },
     "success": {
       "$value": {
         "colorSpace": "srgb",

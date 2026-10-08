@@ -1,6 +1,6 @@
 // One glass surface, drawn with the best tier the device allows.
 //
-// Rules the components rely on (and the lint plugin will enforce):
+// Rules the components rely on:
 // - Never animate `opacity` on a GlassSurface or any ancestor: UIGlassEffect
 //   stops rendering under a faded parent. Animate transforms instead.
 // - Never nest glass in glass. Put neighbouring glass in one <GlassGroup>.
@@ -12,6 +12,8 @@ import { colors, glass as glassTokens } from '@fluxnative/tokens';
 import { getGlassAdapter, type GlassVariant } from './adapter.ts';
 import { useGlassEnvironment } from './environment.ts';
 import { resolveGlassTier, type GlassRole, type GlassTier } from './tiers.ts';
+import { withAlpha } from './color.ts';
+import { GLASS_LOOK } from './contract.ts';
 
 export interface GlassSurfaceProps {
   children?: ReactNode;
@@ -101,7 +103,7 @@ export function GlassSurface({
           // backdrop-filter ignores the parent's rounded clip on the web.
           style={[StyleSheet.absoluteFill, shape]}
         />
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: tintColor ? withAlpha(tintColor, 0.18) : undefined }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: tintColor ? withAlpha(tintColor, GLASS_LOOK.tintAlpha.blur) : undefined }]} />
         <View style={[StyleSheet.absoluteFill, shape, styles.rim, { borderColor: palette['glass-border'] }]} />
         {children}
       </View>
@@ -124,8 +126,8 @@ export function GlassSurface({
   return (
     <View style={[styles.clip, shape, style]} pointerEvents={pointerEvents}>
       <View style={[StyleSheet.absoluteFill, { backgroundColor: palette['glass-fill'] }]} />
-      {tintColor ? <View style={[StyleSheet.absoluteFill, { backgroundColor: withAlpha(tintColor, 0.14) }]} /> : null}
-      <View style={[styles.sheen, { backgroundColor: palette['glass-highlight'], opacity: dark ? 0.08 : 0.16 }]} pointerEvents="none" />
+      {tintColor ? <View style={[StyleSheet.absoluteFill, { backgroundColor: withAlpha(tintColor, GLASS_LOOK.tintAlpha.translucent) }]} /> : null}
+      <View style={[styles.sheen, { backgroundColor: palette['glass-highlight'], opacity: dark ? GLASS_LOOK.sheenOpacity.dark : GLASS_LOOK.sheenOpacity.light }]} pointerEvents="none" />
       <View
         style={[styles.topLine, { marginHorizontal: radius * 0.6, backgroundColor: palette['glass-highlight'] }]}
         pointerEvents="none"
@@ -166,12 +168,6 @@ export function GlassGroup({ children, spacing = 8, style }: GlassGroupProps) {
   return <View style={style}>{children}</View>;
 }
 
-function withAlpha(color: string, alpha: number): string {
-  const hex = /^#([0-9a-f]{6})$/i.exec(color)?.[1];
-  if (!hex) return color;
-  const n = parseInt(hex, 16);
-  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
-}
 
 const styles = StyleSheet.create({
   clip: { overflow: 'hidden' },

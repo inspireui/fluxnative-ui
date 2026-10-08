@@ -23,18 +23,21 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "jest"
   },
   "dependencies": {
     "@fluxnative/glass": "workspace:*",
     "@fluxnative/tokens": "workspace:*",
-    "@fluxnative/tw-runtime": "workspace:*"
+    "@fluxnative/tw-runtime": "workspace:*",
+    "@fluxnative/icons": "workspace:*"
   },
   "peerDependencies": {
     "expo-router": ">=57",
     "react": ">=19",
     "react-native": ">=0.84",
-    "react-native-safe-area-context": ">=5"
+    "react-native-safe-area-context": ">=5",
+    "react-native-svg": ">=15"
   },
   "peerDependenciesMeta": {
     "expo-router": {
@@ -42,11 +45,20 @@
     }
   },
   "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@jest/globals": "^29.7.0",
+    "@react-native/babel-preset": "0.86.3",
+    "@react-native/jest-preset": "0.86.3",
+    "@testing-library/react-native": "^13.3.3",
     "@types/react": "~19.2.2",
+    "babel-jest": "^29.7.0",
     "expo-router": "~57.0.25",
+    "jest": "^29.7.0",
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
+    "react-test-renderer": "19.2.3",
     "typescript": "~6.0.3"
   }
 }
