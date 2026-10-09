@@ -381,6 +381,8 @@ function keysOf(group: string, kit: TokenModel): readonly string[] {
   }
 }
 
+const TOKEN_PROPERTIES = ['$value', '$type', '$description', '$extensions', '$deprecated'];
+
 /** Like `flatten`, but records each problem and keeps going. */
 function walk(node: Record<string, unknown>, file: string, problems: BrandProblem[], inherited?: string, path: string[] = []): Token[] {
   const groupType = typeof node.$type === 'string' ? node.$type : inherited;
@@ -394,7 +396,16 @@ function walk(node: Record<string, unknown>, file: string, problems: BrandProble
       continue;
     }
     if (!('$value' in child)) {
+      if (!Object.keys(child).some((k) => !k.startsWith('$'))) {
+        problems.push(error(at, `has no $value and no tokens; a token needs "$value" (${file})`));
+        continue;
+      }
       tokens.push(...walk(child, file, problems, groupType, here));
+      continue;
+    }
+    const stray = Object.keys(child).filter((k) => !TOKEN_PROPERTIES.includes(k));
+    if (stray.length) {
+      problems.push(error(at, `a token holds only ${TOKEN_PROPERTIES.join(', ')}; found ${stray.join(', ')} (${file})`));
       continue;
     }
     const type = typeof child.$type === 'string' ? child.$type : groupType;
@@ -678,7 +689,10 @@ function checkRules(model: TokenModel, kitModel: TokenModel, meta: BrandMeta, ra
     for (const [fg, bg, min] of CONTRAST_PAIRS) {
       const ratio = contrastRatio(palette, fg, bg, scheme);
       if (ratio >= min) continue;
-      const kitOwned = [fg, bg, 'background'].every((name) => palette[name] === kitPalette[name]);
+      // The kit's own pair, untouched: same colours and the same ratio (a new
+      // background only matters when it shows through a translucent colour).
+      const kitOwned =
+        palette[fg] === kitPalette[fg] && palette[bg] === kitPalette[bg] && Math.abs(ratio - contrastRatio(kitPalette, fg, bg, scheme)) < 1e-9;
       const text = `${fg} on ${bg} is ${ratio.toFixed(2)}:1, needs ${min}:1`;
       problems.push(kitOwned ? warning(scheme, `${text} (kit default; override one of them to fix)`) : error(scheme, text));
     }

@@ -209,6 +209,14 @@ const cases: Case[] = [
   { rule: 'border 1.5:1, alpha composited', doc: brand(colors({ border: color('#000000', 0.1) })), expect: [['error', 'light', /^border on background is 1\.2\d:1, needs 1\.5:1$/]] },
   { rule: 'border alpha that passes', doc: brand(colors({ border: color('#000000', 0.35) })), expect: [], absent: [/border on background/] },
   {
+    rule: 'a new background fails the translucent kit border, not the opaque kit pairs',
+    doc: brand(colors({ background: color('#f8f8f8') })),
+    expect: [
+      ['error', 'light', /^border on background is 1\.\d\d:1, needs 1\.5:1$/],
+      ['warning', 'light', /^primary-foreground on primary is 4\.02:1, needs 4\.5:1 \(kit default/],
+    ],
+  },
+  {
     rule: 'dark palette checked when scheme is system',
     doc: brand({}, { scheme: 'system' }),
     dark: colors({ primary: color('#bfe0ff') }),
@@ -295,6 +303,12 @@ const cases: Case[] = [
   },
   { rule: '$type must fit the group', doc: brand(group('shape', 'number', { card: 24 })), expect: [['error', 'shape.card', /^\$type number doesn't fit; use dimension/]] },
   { rule: 'missing $type', doc: brand({ layout: { gutter: { $value: px(20) } } }), expect: [['error', 'layout.gutter', /^has no \$type and no group sets one/]] },
+  { rule: 'a misspelled $value', doc: brand({ color: { $type: 'color', primary: { $valeu: color('#1b5e20') } } }), expect: [['error', 'color.primary', /^has no \$value and no tokens; a token needs "\$value"/]] },
+  {
+    rule: 'a token holds no children',
+    doc: brand({ shape: { $type: 'dimension', card: { $value: '{radius.3xl}', inner: { $value: '{radius.2xl}' } } } }),
+    expect: [['error', 'shape.card', /^a token holds only \$value, \$type, \$description, \$extensions, \$deprecated; found inner/]],
+  },
   {
     rule: 'dark file sets every light role',
     doc: brand(colors({ primary: color('#1b5e20'), 'foreground-soft': color('#4a4a4a') }), { scheme: 'system' }),

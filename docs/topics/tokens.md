@@ -193,7 +193,7 @@ The checks are deterministic. `validateBrand` collects every problem, and `resol
 | Motion | duration fast 100–180, normal 180–300, slow 300–500 ms, increasing; easing x1 and x2 within 0–1 | error |
 | Interaction | active-scale 0.9–1; hit-slop 0–12 px; stagger ≤ 80 ms; skeleton opacities 0–1 | error |
 | Layout | gutter 16, 20 or 24; tab-bar-height 56–88 and a multiple of 4 | error |
-| Closed | an unknown group, token, extension or metadata key; a missing `$type`; a typography value missing one of its five fields; a broken alias; a dark file missing a role the light file sets | error |
+| Closed | an unknown group, token, extension or metadata key; a token without `$value` or with extra keys; a missing `$type`; a typography value missing one of its five fields; a broken alias; a dark file missing a role the light file sets | error |
 | Schemes | light colours with no dark file under `scheme: system`, or with `scheme: dark` | warning |
 
 Contrast is checked on each scheme the template shows (one when `scheme` locks it), with translucent colours laid over the background. A pair the brand leaves at the kit's values is a warning: the kit's iOS palette is itself under three thresholds (white on `primary` 4.02:1 light and 3.65:1 dark, white on `destructive` 3.55:1 and 3.41:1, light `border` 1.37:1).
