@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { DOCS_URL, FILES_DIR, GENERATED, componentDeps, importGraph, listFiles, render, selectFiles } from './emit.ts';
 import { emitIcon } from './icon.ts';
+import { CATALOG_INDEX_LIMIT, renderCatalogIndex } from './catalog-index.ts';
 import { MANIFEST_FILE, loadManifest, parseManifest, readManifest, renderManifest, sha256 } from './manifest.ts';
 import { COLOR_NAMES, emitTokens, kitSources, resolveColors, validateOverrides } from './tokens.ts';
 import { brandLayers, resolveBrand } from '@fluxnative/tokens/brand';
@@ -342,4 +343,18 @@ test('a brand edit after emit: check names the changed file, update re-renders, 
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('the catalog index fits the budget, lists every component and the token roles, and matches docs/llm', () => {
+  const index = renderCatalogIndex();
+  assert.ok(Buffer.byteLength(index, 'utf8') <= CATALOG_INDEX_LIMIT, `${Buffer.byteLength(index, 'utf8')} bytes`);
+  for (const rel of listFiles()) {
+    const m = /^components\/(?:\w+\/)?(\w+)\.tsx$/.exec(rel);
+    if (m && m[1] !== 'bridge') assert.match(index, new RegExp(`\\|\`${m[1]}\`\\|`), m[1]);
+  }
+  assert.match(index, /\|`type`\|display headline title body bodySm label caps numeric\|/);
+  assert.match(index, /\|`elevation`\|0 1 2 3 4\|/);
+  assert.doesNotMatch(index.replace(/\\\|/g, ''), /\|[^|\n]*'[a-z]+'\|'/, 'pipes inside a cell are escaped');
+  const committed = readFileSync(join(import.meta.dirname, '..', '..', '..', 'docs', 'llm', 'CATALOG.index.md'), 'utf8');
+  assert.equal(committed, index, 'run `pnpm tokens` to regenerate docs/llm/CATALOG.index.md');
 });

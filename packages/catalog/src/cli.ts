@@ -3,6 +3,7 @@
 // fluxnative-catalog update --to <files dir> [--colors <json> | --brand <path>] [--only A,B | +A,-B] [--dry-run] [--json] [--merge --base-dir <dir>]
 // fluxnative-catalog check  --to <files dir> [--colors <json> | --brand <path>] [--only A,B] [--upstream [--strict]]
 // fluxnative-catalog build  [--check]   regenerate this package's own files/ (default colours)
+// fluxnative-catalog index  [--out <path>] [--check]   write docs/llm/CATALOG.index.md, the ≤ 8 KB index models read
 //
 // `emit` writes the layer into a Flux template's `files/` folder (theme/,
 // components/) with a `.fluxnative-ui.json` manifest; `--check` writes
@@ -17,7 +18,8 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
-import { CATALOG_VERSION, FILES_DIR, GENERATED, render } from './emit.ts';
+import { CATALOG_VERSION, FILES_DIR, GENERATED, PACKAGE_ROOT, render } from './emit.ts';
+import { CATALOG_INDEX_LIMIT, renderCatalogIndex } from './catalog-index.ts';
 import { catalogCommit } from './git.ts';
 import { MANIFEST_FILE, loadManifest, type Manifest } from './manifest.ts';
 import { formatProblems } from '@fluxnative/tokens/brand';
@@ -38,6 +40,7 @@ function usage(code: number): never {
       '  fluxnative-catalog update --to <files dir> [--colors <json> | --brand <path>] [--only A,B | +A,-B] [--dry-run] [--json] [--merge --base-dir <dir>]',
       '  fluxnative-catalog check  --to <files dir> [--colors <json> | --brand <path>] [--only A,B] [--upstream [--strict]]',
       '  fluxnative-catalog build  [--check]',
+      '  fluxnative-catalog index  [--out <path>] [--check]',
     ].join('\n'),
   );
   process.exit(code);
@@ -148,6 +151,21 @@ if (command === 'build') {
     process.exit(1);
   }
   if (check) console.log('catalog files up to date');
+} else if (command === 'index') {
+  expectArgs(['--out'], ['--check']);
+  const out = resolve(process.cwd(), flag(argv, '--out') ?? join(PACKAGE_ROOT, '..', '..', 'docs', 'llm', 'CATALOG.index.md'));
+  const text = renderCatalogIndex();
+  const size = Buffer.byteLength(text, 'utf8');
+  if (size > CATALOG_INDEX_LIMIT) {
+    console.error(`catalog index is ${size} bytes, over the ${CATALOG_INDEX_LIMIT}-byte budget: shorten component summaries or props`);
+    process.exit(1);
+  }
+  const drift = writeAll(dirname(out), { [relative(dirname(out), out)]: text }, check);
+  if (drift) {
+    console.error('catalog index out of date — run `pnpm tokens` (or `pnpm catalog index`)');
+    process.exit(1);
+  }
+  if (check) console.log(`catalog index up to date (${size} bytes)`);
 } else if (command === 'emit') {
   const to = flag(argv, '--to');
   if (!to) usage(2);
