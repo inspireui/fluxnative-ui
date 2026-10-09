@@ -16,7 +16,7 @@
   "files": {
     "components/Button.tsx": "c95bb17421361075efbd0f93c138bfa1f5031e60242b28f34b25788558abd244",
     "components/Chip.tsx": "e45755f0a0a62db8969f1b8b55cb799717537ec024fcd90405f3b14cad93139e",
-    "components/Icon.tsx": "539f2a5f15f12324f6c6be7546a77452226a17418d3f2ac73c65647aeace9599",
+    "components/Icon.tsx": "0520db33e09e83bb80630a898ae48e8813f1e4a7cf0e3dd575c265cb32fbbf5f",
     "components/IconButton.tsx": "28612025d0127b5c78fca7614c052c2ecf95ebf9e0f148e1cd27d14718d8d26a",
     "components/Press.tsx": "893ee9a6ecc009dee8ff06ca494dce40c9ae214a1319936d3d97b0872ed02620",
     "components/Reveal.tsx": "93656b9c586b867161629b4f42d95a47cfbac00597f51c75c002ad8c7613521a",
