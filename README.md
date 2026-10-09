@@ -81,6 +81,7 @@ pnpm tokens:check  # the same, failing on drift (CI runs it)
 pnpm test          # node:test suites (tokens, glass, class resolver, icons, catalog) + jest render tests (ui)
 pnpm typecheck
 pnpm catalog emit --to <template>/files [--colors <template>/colors.json]   # the catalog layer into a Flux template
+pnpm catalog update --to <template>/files [--dry-run] [--json]   # bring a template to the current catalog; hand edits are reported, never overwritten
 EXPO_PUBLIC_STYLE_ENGINE=runtime pnpm --filter fluxnative-ui-expo-example web   # the example on the runtime class engine
 pnpm --filter fluxnative-ui-expo-example web
 pnpm --filter fluxnative-ui-expo-example ios

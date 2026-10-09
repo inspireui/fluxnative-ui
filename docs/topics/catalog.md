@@ -22,7 +22,8 @@ flowchart LR
 ```bash
 # from the fluxnative-ui checkout
 node packages/catalog/src/cli.ts emit --to <catalog repo>/templates/<id>/files [--colors <catalog repo>/templates/<id>/colors.json] [--only Button,Sheet]
-node packages/catalog/src/cli.ts check --to <catalog repo>/templates/<id>/files [--colors …]   # exit 1 on drift, nothing written
+node packages/catalog/src/cli.ts update --to <catalog repo>/templates/<id>/files [--dry-run]   # after a catalog change; hand edits are reported, never overwritten
+node packages/catalog/src/cli.ts check --to <catalog repo>/templates/<id>/files [--upstream]   # exit 1 on a hand edit, nothing written
 ```
 
 `emit` writes:
@@ -33,11 +34,124 @@ node packages/catalog/src/cli.ts check --to <catalog repo>/templates/<id>/files 
 | `theme/usePalette.ts` | `useScheme()` and `usePalette()` (honours `lockedScheme`) |
 | `components/Icon.tsx` | generated from the icon table; `<Icon name="bag" size={22} filled />` |
 | `components/*.tsx` | the primitives below |
-| `.fluxnative-ui.json` | catalog version, overrides hash, `--only` selection, sha256 per file |
+| `.fluxnative-ui.json` | the [manifest](#the-manifest-fluxnative-uijson): catalog version and commit, inputs, sha256 per file, the template's forks and compositions |
 
-`--only` keeps the named components (and what they import); the theme files
-always ship. `check` reuses the manifest's selection, so a template's CI only
-needs `check --to … --colors …`.
+Every file under `components/` and `theme/` starts with a [header](#the-header)
+that names it. `--only` keeps the named components and everything they import
+(found by following relative imports); the theme files always ship. Without
+`--only`, `emit` keeps the manifest's selection, and `check` reads everything
+from the manifest, so a template's CI only needs `check --to …` (plus
+`--colors` while its manifest is still schema 1).
+
+## Update a template
+
+```bash
+node packages/catalog/src/cli.ts update --to <files> [--colors <json>] [--only A,B | +A,-B] [--dry-run] [--json] [--merge --base-dir <dir>]
+```
+
+`update` brings a template to the catalog in this checkout without losing
+what its owner changed. Per file, from `.fluxnative-ui.json`:
+
+| file | `update` |
+|---|---|
+| missing, or matches its `files` hash (pristine) | writes the catalog's copy |
+| equals the catalog's copy | leaves it |
+| differs from its hash (a hand edit) | leaves it and reports `drift` with a diff (local → catalog); `--merge` merges it instead |
+| no longer emitted (dropped by the catalog or by `--only`) | deletes it when pristine; otherwise leaves it, reports `keptLocal` and stops tracking it |
+| declared in `forks` | never writes it; reports a stale fork when the catalog copy no longer hashes to `upstream` |
+| declared in `compositions` | never touches it |
+
+It then writes a schema 2 manifest (a schema 1 manifest is upgraded). Exit
+0: in sync. Exit 2: drift, a conflict or a stale fork; nothing was lost and a
+person decides. Exit 1: an error. `--dry-run` writes nothing. `--json`
+prints `{ from, to, dryRun, written, merged, deleted, unchanged, drift: [{ path, reason, diff }], conflicts, staleForks: [{ path, upstream, current }], keptLocal, warnings }`;
+no report file is written into the template.
+
+- **Inputs.** Without `--colors`, `update` reuses the manifest's `colorsPath`
+  (relative to the files dir) and fails when the manifest records overrides
+  whose file is gone. A schema 1 manifest has no `colorsPath`: pass
+  `--colors` once.
+- **`--only`.** Absent keeps the manifest's selection, `A,B` replaces it,
+  `+A,-B` changes it. Dependencies are resolved afterwards: `+StateView` also
+  brings `Button` and `Press`, and `-Press` keeps `Press` (with a warning)
+  while a selected component imports it.
+- **`--merge --base-dir <dir>`.** A drifted file is merged with
+  `git merge-file -p --zdiff3 <local> <base> <catalog>`, the base being
+  `<dir>/<path>`: the copy that was emitted, whose hash must equal the
+  manifest's `files` entry (a checkout of the template at its last update, or
+  an `emit` from the recorded `catalog.commit` into a temporary dir). A clean
+  merge is written; a conflict is written with markers (exit 2). A merged file
+  still carries its hand edit, so `check` keeps reporting it until it is
+  reverted or declared a fork: catalog files are meant to be pristine or
+  declared forks, and the merge is the escape hatch, not the main path.
+
+## Check a template
+
+```bash
+node packages/catalog/src/cli.ts check --to <files> [--colors <json>]          # the template against its own manifest
+node packages/catalog/src/cli.ts check --to <files> --upstream [--strict]     # and what `update` would change
+```
+
+`check` compares the template with **its own manifest**, not with the
+catalog, so it stays green when the catalog moves on. Every file in `files`
+must exist with the recorded hash (`stale: <path>` otherwise; forks and
+compositions are skipped), and the colour overrides (`--colors`, or the
+manifest's `colorsPath`) must still hash to `inputs.colors`; exit 1
+otherwise. `--upstream` also renders the current catalog with the template's
+inputs and prints `update available: <path> (changed|added|removed)` and the
+forks behind the catalog; it exits 0 unless `--strict`. `emit --check` keeps
+its meaning: exit 1 when `emit` would change any byte, the manifest (and its
+`catalog.commit`) included.
+
+## The manifest (`.fluxnative-ui.json`)
+
+```json
+{
+  "schema": 2,
+  "catalog": { "version": "0.1.0", "commit": "10b77de…", "repo": "inspireui/fluxnative-ui" },
+  "inputs": { "colors": "<sha256>", "colorsPath": "../colors.json", "brand": null, "brandPath": null, "only": ["Press", "Icon"] },
+  "files": { "components/Press.tsx": "<sha256>" },
+  "forks": { "components/Sheet.tsx": { "reason": "own drag handle", "since": "0.1.0", "upstream": "<sha256>" } },
+  "compositions": { "components/CtaButton.tsx": { "wraps": "Button", "reason": "60 px checkout CTA" } },
+  "applied": { "codemods": [] }
+}
+```
+
+- `catalog.commit`: `HEAD` of the catalog checkout when packages/catalog,
+  packages/tokens and packages/icons have no local changes; otherwise
+  `gitHead` from package.json, else `null`. `FLUXNATIVE_CATALOG_COMMIT`
+  overrides it (empty means `null`). This package's own copy
+  (`packages/catalog/files/.fluxnative-ui.json`) always records `null`, so CI
+  does not go stale on every commit.
+- `files`: per path, the hash of the catalog copy the file was last synced
+  to, header included. A file that matches it is pristine.
+- `forks` and `compositions` are written by the template's owner; `emit` and
+  `update` keep them and never write their paths. To fork a primitive, move
+  its `files` hash into `forks` as `upstream`, with a `reason` and the catalog
+  version as `since`. After porting a newer catalog change into the fork, set
+  `upstream` to the new hash (`update --json` lists it). A composition is a
+  template file that wraps a catalog component (`CtaButton` around `Button`)
+  instead of copying it.
+- `applied.codemods` is reserved for release codemods in a later release;
+  it is kept as is.
+- No timestamps, a fixed key order and maps sorted by key: the bytes change
+  only when the content does. Paths must stay inside the files dir.
+
+## The header
+
+Every emitted file under `components/` and `theme/` names itself, so a reader
+(or a model) that finds it in a template knows where it came from:
+
+```ts
+// FluxNative UI catalog · components/Button.tsx · https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/catalog.md
+// Emitted by fluxnative-catalog — declare a fork in .fluxnative-ui.json instead of editing.
+```
+
+The generated `theme/tokens.ts` and `components/Icon.tsx` carry the first
+line above their own "do not edit by hand" header. There is no version
+number, so a release leaves an unchanged file byte-identical; the hashes
+cover the header. The sources in `packages/catalog/files/` have none: `emit`
+adds it.
 
 ## Colour overrides
 
