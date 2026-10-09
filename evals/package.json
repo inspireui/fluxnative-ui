@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Kit-level eval for FluxNative UI. Not a workspace package: this file only makes Node load evals/**/*.ts as ES modules. Run it with `pnpm eval` from the repo root."
+}

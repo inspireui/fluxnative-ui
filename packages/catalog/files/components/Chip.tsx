@@ -1,10 +1,11 @@
 // Filter / option chip. Selected = inverted (foreground fill, background
 // label). `round` makes a 44 px circle for sizes and swatches; `struck`
-// crosses the label out for a sold-out option.
+// crosses the label out for a sold-out option. Corners are `shape.chip`,
+// `round` included; the label is `type.label`.
 
 import React from 'react';
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import { fontWeight, radius, space, text } from '../theme/tokens';
+import { shape, space, text, type } from '../theme/tokens';
 import { usePalette } from '../theme/usePalette';
 import Press, { type PressRole } from './Press';
 
@@ -16,7 +17,7 @@ export interface ChipProps {
   onPress?: () => void;
   /** 32 or 36 px tall. Default 'md'. */
   size?: ChipSize;
-  /** A 44 px circle instead of a pill. */
+  /** A 44 px circle instead of a pill (rounded by `shape.chip`, like the pill). */
   round?: boolean;
   /** Cross the label out (unavailable option). */
   struck?: boolean;
@@ -70,7 +71,7 @@ export default function Chip({
         <Text
           numberOfLines={1}
           style={[
-            styles.label,
+            type.label,
             size === 'sm' ? styles.labelSm : null,
             { color: ink },
             struck ? styles.struck : null,
@@ -84,11 +85,11 @@ export default function Chip({
 }
 
 const styles = StyleSheet.create({
-  chip: { borderRadius: radius.full, alignItems: 'center', justifyContent: 'center' },
+  chip: { borderRadius: shape.chip, alignItems: 'center', justifyContent: 'center' },
   round: { width: ROUND, height: ROUND },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   leading: { marginRight: space[2] },
-  label: { fontSize: text.sm.fontSize, lineHeight: text.sm.lineHeight, fontWeight: fontWeight.medium },
+  // Comp token: the `sm` chip sets the label role one step smaller.
   labelSm: { fontSize: text.xs.fontSize, lineHeight: text.xs.lineHeight },
   struck: { textDecorationLine: 'line-through', opacity: 0.55 },
 });

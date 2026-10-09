@@ -1,0 +1,3 @@
+# Reports from real runs stay local; share the ones worth keeping in a PR or an issue.
+reports/*
+!reports/.gitkeep

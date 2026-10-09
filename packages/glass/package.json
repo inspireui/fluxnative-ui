@@ -1,7 +1,7 @@
 {
   "name": "@fluxnative/glass",
   "version": "0.0.0",
-  "description": "The FluxNative UI glass ladder: native Liquid Glass, blur, translucent or opaque \u2014 chosen per device and accessibility settings.",
+  "description": "The FluxNative UI glass ladder: native Liquid Glass, blur, translucent or opaque — chosen per device and accessibility settings.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -22,7 +22,10 @@
   },
   "files": [
     "src",
-    "hosts"
+    "hosts",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/**/__tests__"
   ],
   "sideEffects": [
     "./src/expo.tsx"

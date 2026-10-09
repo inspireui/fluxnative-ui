@@ -50,11 +50,14 @@ export default function Icon({ name, size = 24, color, strokeWidth = 2, filled =
   const paint = color ?? palette.foreground;
   const d = filled ? (spec.fillPath ?? spec.path) : spec.path;
   const svg = (
-    <Svg width={size} height={size} viewBox="0 0 24 24" style={accessibilityLabel === undefined ? style : undefined}>
+    <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path d={d} fill={filled ? paint : 'none'} stroke={paint} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
     </Svg>
   );
-  if (accessibilityLabel === undefined) return svg;
+  // \`style\` goes on a View, never on <Svg>: react-native-svg types its style
+  // differently per platform, and FluxNative's web preview typecheck rejects
+  // a StyleProp<ViewStyle> there.
+  if (accessibilityLabel === undefined) return style === undefined ? svg : <View style={style}>{svg}</View>;
   return (
     <View style={style} accessible accessibilityRole="image" accessibilityLabel={accessibilityLabel}>
       {svg}

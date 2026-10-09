@@ -14,11 +14,14 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "bin": {
-    "fluxnative-catalog": "src/cli.ts"
+    "fluxnative-catalog": "src/bin.js"
   },
   "files": [
     "src",
-    "files"
+    "files",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/**/__tests__"
   ],
   "scripts": {
     "build": "node src/cli.ts build",

@@ -7,13 +7,14 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "tokens": "node packages/tokens/src/build.ts --global-css apps/expo-example/src/global.css && node packages/glass/src/build-hosts.ts && node packages/catalog/src/cli.ts build",
+    "tokens": "node packages/tokens/src/build.ts --global-css apps/expo-example/src/global.css && node packages/glass/src/build-hosts.ts && node packages/catalog/src/cli.ts build && node packages/catalog/src/cli.ts index",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "changeset": "changeset",
     "release": "turbo run build && changeset publish",
-    "tokens:check": "node packages/tokens/src/build.ts --check --global-css apps/expo-example/src/global.css && node packages/glass/src/build-hosts.ts --check && node packages/catalog/src/cli.ts build --check",
-    "catalog": "node packages/catalog/src/cli.ts"
+    "tokens:check": "node packages/tokens/src/build.ts --check --global-css apps/expo-example/src/global.css && node packages/glass/src/build-hosts.ts --check && node packages/catalog/src/cli.ts build --check && node packages/catalog/src/cli.ts index --check",
+    "catalog": "node packages/catalog/src/cli.ts",
+    "eval": "node evals/runner/run.ts"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.0",

@@ -1,5 +1,7 @@
 // The one pressable. Scales down while pressed, fires an optional haptic
-// through the host bridge, and always carries a screen-reader name.
+// through the host bridge, and always carries a screen-reader name. Its
+// defaults (haptic, scale, hit slop, spring) are the template's interaction
+// profile, `interaction.press` in theme/tokens; props still override them.
 // Layout styles (flex, position, margins) go on the Pressable so the
 // control sits in its parent's layout; the rest paints the animated box.
 
@@ -14,6 +16,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { interaction } from '../theme/tokens';
 import { bridge } from './bridge';
 import useReducedMotion from './useReducedMotion';
 
@@ -31,14 +34,17 @@ export interface PressProps {
   accessibilityRole?: PressRole;
   accessibilityState?: AccessibilityState;
   disabled?: boolean;
-  /** Haptic on press, through the host bridge when it has one. Default 'none'. */
+  /** Haptic on press, through the host bridge when it has one. Default `interaction.press.haptic` ('none' in the kit). */
   haptic?: PressHaptic;
-  /** Scale while pressed. Default 0.96; 1 turns it off. */
+  /** Scale while pressed; 1 turns it off. Default `interaction.press.activeScale` (0.96 in the kit). */
   activeScale?: number;
-  /** Extra hit area in px on every side. Default 0. */
+  /** Extra hit area in px on every side. Default `interaction.press.hitSlop` (0 in the kit). */
   hitSlop?: number;
   testID?: string;
 }
+
+/** How far a disabled control fades. Not a token: every template dims the same way. */
+const DISABLED_OPACITY = 0.45;
 
 const OUTER_KEYS = new Set<keyof ViewStyle>([
   'flex',
@@ -86,9 +92,9 @@ export default function Press({
   accessibilityRole = 'button',
   accessibilityState,
   disabled = false,
-  haptic = 'none',
-  activeScale = 0.96,
-  hitSlop = 0,
+  haptic = interaction.press.haptic,
+  activeScale = interaction.press.activeScale,
+  hitSlop = interaction.press.hitSlop,
   testID,
 }: PressProps) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -97,7 +103,8 @@ export default function Press({
 
   const to = (value: number) => {
     if (reduced || activeScale === 1) return;
-    Animated.spring(scale, { toValue: value, useNativeDriver: true, speed: 40, bounciness: 0 }).start();
+    const { speed, bounciness } = interaction.press.spring;
+    Animated.spring(scale, { toValue: value, useNativeDriver: true, speed, bounciness }).start();
   };
 
   return (
@@ -124,5 +131,5 @@ export default function Press({
 }
 
 const styles = StyleSheet.create({
-  disabled: { opacity: 0.45 },
+  disabled: { opacity: DISABLED_OPACITY },
 });

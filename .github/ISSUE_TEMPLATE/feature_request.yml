@@ -1,0 +1,25 @@
+name: Feature request
+description: Propose a component, prop, token or icon.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        FluxNative UI keeps its API small and closed so models use it correctly, and a released name is hard to change ([versioning policy](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/versioning.md)). Proposals that start from a real screen are the easiest to accept.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you building, and what is missing or awkward today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: The names and props, and how app code would use them.
+      render: tsx
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered

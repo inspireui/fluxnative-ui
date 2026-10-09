@@ -313,5 +313,450 @@
       },
       "$description": "Gap between the floating tab bar and the screen edges."
     }
+  },
+  "font": {
+    "$type": "fontFamily",
+    "$description": "Font stack per role, first choice first; the last entry is a generic family. Hosts load no web fonts yet, so v0.1 allows system families only.",
+    "display": {
+      "$value": [
+        "System"
+      ],
+      "$description": "Display, headline and title roles."
+    },
+    "text": {
+      "$value": [
+        "System"
+      ],
+      "$description": "Body, label and caps roles."
+    },
+    "numeric": {
+      "$value": [
+        "System"
+      ],
+      "$description": "Prices, counters and stats.",
+      "$extensions": {
+        "dev.fluxnative": {
+          "fontVariant": [
+            "tabular-nums"
+          ]
+        }
+      }
+    }
+  },
+  "type": {
+    "$type": "typography",
+    "$description": "Text roles. A template's brand sets its own sizes; these defaults sit on the `text` scale and match the catalog primitives.",
+    "display": {
+      "$value": {
+        "fontFamily": "{font.display}",
+        "fontSize": "{text.3xl.size}",
+        "fontWeight": "{font-weight.bold}",
+        "lineHeight": "{text.3xl.line-height}",
+        "letterSpacing": {
+          "value": -0.5,
+          "unit": "px"
+        }
+      },
+      "$description": "The largest line on a screen."
+    },
+    "headline": {
+      "$value": {
+        "fontFamily": "{font.display}",
+        "fontSize": "{text.2xl.size}",
+        "fontWeight": "{font-weight.bold}",
+        "lineHeight": "{text.2xl.line-height}",
+        "letterSpacing": {
+          "value": -0.3,
+          "unit": "px"
+        }
+      },
+      "$description": "Screen and hero headings."
+    },
+    "title": {
+      "$value": {
+        "fontFamily": "{font.display}",
+        "fontSize": "{text.xl.size}",
+        "fontWeight": "{font-weight.bold}",
+        "lineHeight": "{text.xl.line-height}",
+        "letterSpacing": {
+          "value": -0.2,
+          "unit": "px"
+        }
+      },
+      "$description": "Sheet and section titles."
+    },
+    "body": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontSize": "{text.base.size}",
+        "fontWeight": "{font-weight.normal}",
+        "lineHeight": "{text.base.line-height}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Running text."
+    },
+    "body-sm": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontSize": "{text.sm.size}",
+        "fontWeight": "{font-weight.normal}",
+        "lineHeight": "{text.sm.line-height}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Secondary text, captions, state-view body."
+    },
+    "label": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontSize": "{text.sm.size}",
+        "fontWeight": "{font-weight.medium}",
+        "lineHeight": "{text.sm.line-height}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Chips, text actions, tabs."
+    },
+    "caps": {
+      "$value": {
+        "fontFamily": "{font.text}",
+        "fontSize": {
+          "value": 11,
+          "unit": "px"
+        },
+        "fontWeight": "{font-weight.semibold}",
+        "lineHeight": 1.2727,
+        "letterSpacing": {
+          "value": 1.2,
+          "unit": "px"
+        }
+      },
+      "$description": "Eyebrows; render in upper case."
+    },
+    "numeric": {
+      "$value": {
+        "fontFamily": "{font.numeric}",
+        "fontSize": "{text.base.size}",
+        "fontWeight": "{font-weight.semibold}",
+        "lineHeight": "{text.base.line-height}",
+        "letterSpacing": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$description": "Prices, counters and stats."
+    }
+  },
+  "shape": {
+    "$type": "dimension",
+    "$description": "Corner radius per surface role. Values alias the `radius` scale only.",
+    "control": {
+      "$value": "{radius.full}",
+      "$description": "Buttons and other pill controls."
+    },
+    "card": {
+      "$value": "{radius.2xl}",
+      "$description": "Cards, cells, inline banners."
+    },
+    "card-inner": {
+      "$value": "{radius.xl}",
+      "$description": "Media and panels inside a card; never rounder than the card."
+    },
+    "sheet": {
+      "$value": "{radius.3xl}",
+      "$description": "Top corners of a bottom sheet."
+    },
+    "chip": {
+      "$value": "{radius.full}"
+    },
+    "avatar": {
+      "$value": "{radius.full}"
+    },
+    "field": {
+      "$value": "{radius.xl}",
+      "$description": "Text fields and search pills."
+    },
+    "well": {
+      "$value": "{radius.lg}",
+      "$description": "Recessed fills: skeleton blocks, image wells."
+    }
+  },
+  "elevation": {
+    "$type": "shadow",
+    "$description": "Shadow per level. React Native draws the first layer; Android draws `$extensions[\"dev.fluxnative\"].android` instead.",
+    "0": {
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0,
+          "hex": "#000000"
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 0,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 0,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "dev.fluxnative": {
+          "android": 0
+        }
+      }
+    },
+    "1": {
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.08,
+          "hex": "#000000"
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 1,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 3,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "dev.fluxnative": {
+          "android": 1
+        }
+      }
+    },
+    "2": {
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.1,
+          "hex": "#000000"
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 4,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 8,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "dev.fluxnative": {
+          "android": 3
+        }
+      }
+    },
+    "3": {
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.12,
+          "hex": "#000000"
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 8,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 16,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "dev.fluxnative": {
+          "android": 6
+        }
+      }
+    },
+    "4": {
+      "$value": {
+        "color": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0,
+            0
+          ],
+          "alpha": 0.16,
+          "hex": "#000000"
+        },
+        "offsetX": {
+          "value": 0,
+          "unit": "px"
+        },
+        "offsetY": {
+          "value": 12,
+          "unit": "px"
+        },
+        "blur": {
+          "value": 24,
+          "unit": "px"
+        },
+        "spread": {
+          "value": 0,
+          "unit": "px"
+        }
+      },
+      "$extensions": {
+        "dev.fluxnative": {
+          "android": 12
+        }
+      }
+    }
+  },
+  "interaction": {
+    "$description": "The interaction profile: defaults the catalog primitives read. Enum choices (press haptic, skeleton mode and colours) live in a brand file's `$extensions`.",
+    "press": {
+      "active-scale": {
+        "$type": "number",
+        "$value": 0.96,
+        "$description": "Scale while pressed; 1 turns it off."
+      },
+      "hit-slop": {
+        "$type": "dimension",
+        "$value": {
+          "value": 0,
+          "unit": "px"
+        },
+        "$description": "Extra hit area on every side."
+      },
+      "spring-speed": {
+        "$type": "number",
+        "$value": 40
+      },
+      "spring-bounciness": {
+        "$type": "number",
+        "$value": 0
+      }
+    },
+    "reveal": {
+      "offset": {
+        "$type": "dimension",
+        "$value": {
+          "value": 16,
+          "unit": "px"
+        },
+        "$description": "Rise distance of an entrance."
+      },
+      "duration": {
+        "$type": "duration",
+        "$value": {
+          "value": 600,
+          "unit": "ms"
+        }
+      },
+      "stagger": {
+        "$type": "duration",
+        "$value": {
+          "value": 55,
+          "unit": "ms"
+        },
+        "$description": "Extra delay per list index."
+      }
+    },
+    "skeleton": {
+      "pulse": {
+        "$type": "duration",
+        "$value": {
+          "value": 900,
+          "unit": "ms"
+        },
+        "$description": "One half of a breath: fade out, then back."
+      },
+      "min-opacity": {
+        "$type": "number",
+        "$value": 0.5
+      },
+      "reduced-opacity": {
+        "$type": "number",
+        "$value": 0.8,
+        "$description": "Held still when Reduce Motion is on."
+      }
+    }
+  },
+  "layout": {
+    "$type": "dimension",
+    "$description": "Screen layout metrics.",
+    "gutter": {
+      "$value": {
+        "value": 16,
+        "unit": "px"
+      },
+      "$description": "Side padding of a screen."
+    },
+    "safe-top": {
+      "$value": {
+        "value": 8,
+        "unit": "px"
+      },
+      "$description": "Space under the host's safe-area inset before the first row."
+    },
+    "tab-bar-height": {
+      "$value": "{chrome.tab-bar-height}",
+      "$description": "The template's tab bar height."
+    }
   }
 }

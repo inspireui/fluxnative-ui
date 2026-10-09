@@ -1,7 +1,8 @@
 // Bottom sheet, drawn inside the screen (never a Modal, which escapes the
 // preview frame). Springs up over a scrim; closes on scrim tap, a drag of
 // the handle past 80 px, or `open={false}`. Keep it as the last child of
-// the screen root so it paints above everything.
+// the screen root so it paints above everything. Top corners are
+// `shape.sheet`; the title is `type.title`.
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -15,7 +16,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { duration, fontWeight, radius, space, text } from '../theme/tokens';
+import { duration, shape, space, type } from '../theme/tokens';
 import { usePalette } from '../theme/usePalette';
 import Scrim from './Scrim';
 import useReducedMotion from './useReducedMotion';
@@ -119,7 +120,7 @@ export default function Sheet({
           {title !== undefined || trailing !== undefined ? (
             <View style={styles.titleRow}>
               {title !== undefined ? (
-                <Text accessibilityRole="header" style={[styles.title, { color: palette.foreground }]}>
+                <Text accessibilityRole="header" style={[type.title, { color: palette.foreground }]}>
                   {title}
                 </Text>
               ) : (
@@ -140,15 +141,14 @@ export default function Sheet({
 const styles = StyleSheet.create({
   layer: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, justifyContent: 'flex-end', zIndex: 20 },
   sheet: {
-    borderTopLeftRadius: radius['3xl'],
-    borderTopRightRadius: radius['3xl'],
+    borderTopLeftRadius: shape.sheet,
+    borderTopRightRadius: shape.sheet,
     paddingBottom: space[6],
     maxHeight: '92%',
   },
   grab: { paddingTop: space[2], paddingHorizontal: space[5] },
   handle: { alignSelf: 'center', width: 36, height: 4, borderRadius: 2, marginBottom: space[3] },
   titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: space[3] },
-  title: { fontSize: text.xl.fontSize, lineHeight: text.xl.lineHeight, fontWeight: fontWeight.bold, letterSpacing: -0.2 },
   titleSpacer: { flex: 1 },
   content: { paddingHorizontal: space[5], flexShrink: 1 },
   footer: { paddingHorizontal: space[5], paddingTop: space[3] },
