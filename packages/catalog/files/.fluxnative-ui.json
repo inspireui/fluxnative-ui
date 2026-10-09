@@ -25,7 +25,10 @@
     "components/Sheet.tsx": "16c0e338d48d7b8d994bf68ad5d158bda3284c6b9beb257e0f7fcbf0860f755a",
     "components/Skeleton.tsx": "6669c25d7b7369df184d5a18edcbe55683d7672349e87b95137138875541ece3",
     "components/StateView.tsx": "a27576d7ca83a33e2e04bffaab9580e08d759babe7f5e7101de56f5b34fef1c4",
-    "components/bridge.ts": "c0fad4cfc528d744aeeab86ea6b38d2f6ad9209e1ea39a104810818a0edab6e1",
+    "components/aiState.ts": "20abf250f56dac6ec6c3d2fe09a53b79913f86635e89a550c4caa441502e7c1e",
+    "components/bridge.ts": "56f1c91b381596f78656026147937bdeec5c05cd7e2dc70b290af26e5ab88c51",
+    "components/useAiChat.ts": "1be5116421037720e1ad4be63921b4e8e3bbac641b2675383b8494fcd455d506",
+    "components/useAiTask.ts": "39e3a997de15932c833789099c80de726fabc58c32c19faa4d7dc6ea63f04cb9",
     "components/useReducedMotion.ts": "bd5b48c5ebd5c8798abca01631110faf9def88e9b5c595ca3b9f1cfad3aadce0",
     "theme/tokens.ts": "8bd8c371f4faf45d2a934aefa4651bb7534da813d09747ed2f8073e9cc283d2a",
     "theme/usePalette.ts": "e895f5db61f9ab9eff8d916429e13a5c0865d1434eb52c50df4a12cf106d956e"
