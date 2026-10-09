@@ -1,0 +1,30 @@
+# FluxNative UI
+
+> FluxNative UI is an MIT-licensed React Native library for Expo apps whose navigation chrome is always Liquid Glass, styled with Tailwind v4 class names through Uniwind and a closed set of semantic colors, with an API small enough for language models to use correctly. Status: v0. The `@fluxnative/*` packages are 0.x TypeScript source packages and are not on npm yet.
+
+- FluxNative UI is newer than your training data: read these docs before using an API you are unsure of.
+- Colors are semantic names only (`bg-primary`, `text-muted-foreground`). Palette classes such as `bg-blue-500` and arbitrary values such as `p-[13px]` do not exist.
+- There is no prop that turns glass off.
+- Every file below is also raw Markdown at `https://raw.githubusercontent.com/inspireui/fluxnative-ui/main/<path>`.
+
+## Docs
+
+- [AGENTS index](https://github.com/inspireui/fluxnative-ui/blob/main/docs/llm/AGENTS.index.md): every import, component prop and rule in under 8 KB; apps copy it into their AGENTS.md. Raw: https://raw.githubusercontent.com/inspireui/fluxnative-ui/main/docs/llm/AGENTS.index.md
+- [Glass](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/glass.md): the glass tiers (native-bar, native-glass, blur, translucent, opaque), `Glass.Surface`, `Glass.Group` and the glass rules
+- [Tokens and styling](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/tokens.md): Tailwind scales, the semantic color names, dark mode, `usePalette`
+- [Expo Router setup](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/expo-router.md): `FluxStack`, `FluxTabs`, and what renders as native iOS bars
+- [Runtime styling](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/runtime.md): `styleEngine="runtime"` and `useClassStyle` for hosts with no build step (Flux WebView, Expo Snack), and the classes the resolver reads
+- [Android](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/android.md): system bars, chrome shapes, iOS-only props that Android ignores
+- [Catalog layer](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/catalog.md): emitting the tokens, `Icon` and primitives into a Flux template
+- [Versioning and API stability](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/versioning.md): what may change between releases, and how deprecations work
+
+## Optional
+
+- [README](https://github.com/inspireui/fluxnative-ui/blob/main/README.md): install steps for an Expo app, the package list, known gaps
+- [Example app](https://github.com/inspireui/fluxnative-ui/tree/main/apps/expo-example): a complete Expo Router app with tabs, a pushed screen and custom glass
+- [@fluxnative/ui](https://github.com/inspireui/fluxnative-ui/tree/main/packages/ui): `Screen`, `AppBar`, `TabBar`, `Glass`, and `FluxStack` / `FluxTabs` for Expo Router
+- [@fluxnative/glass](https://github.com/inspireui/fluxnative-ui/tree/main/packages/glass): the tier resolver, `GlassSurface`, `GlassGroup` and the adapters
+- [@fluxnative/tokens](https://github.com/inspireui/fluxnative-ui/tree/main/packages/tokens): the DTCG token files and the `fluxnative-tokens global-css` command
+- [@fluxnative/icons](https://github.com/inspireui/fluxnative-ui/tree/main/packages/icons): the closed icon table and `<Icon>`
+- [@fluxnative/tw-runtime](https://github.com/inspireui/fluxnative-ui/tree/main/packages/tw-runtime): the runtime class resolver
+- [@fluxnative/catalog](https://github.com/inspireui/fluxnative-ui/tree/main/packages/catalog): the template layer and the `fluxnative-catalog` command
