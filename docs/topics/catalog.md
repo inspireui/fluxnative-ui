@@ -205,20 +205,29 @@ node packages/catalog/src/cli.ts emit --to <template>/files --brand <template>/d
 ## Primitives
 
 All default exports, all with a required `accessibilityLabel` where a control
-needs one, all respecting Reduce Motion.
+needs one, all respecting Reduce Motion. Defaults come from `theme/tokens`:
+the `interaction` profile, `type` roles and `shape` roles, so a brand
+restyles them; with the kit's tokens they draw exactly as before.
 
 | component | props |
 |---|---|
-| `Press` | `onPress` `onLongPress?` `accessibilityLabel` `accessibilityRole?` `haptic?`('none'\|'light'\|'selection'\|'medium') `activeScale?`(0.96) `hitSlop?` `disabled?` |
-| `Reveal` | `index?` `delay?` `offset?` — entrance; `stagger(index)` caps at 7 × 55 ms |
-| `Skeleton` | `width?` `height?` `radius?` `circle?` |
+| `Press` | `onPress` `onLongPress?` `accessibilityLabel` `accessibilityRole?` `haptic?`('none'\|'light'\|'selection'\|'medium') `activeScale?` `hitSlop?` `disabled?` — defaults and spring from `interaction.press` (kit: 'none', 0.96, 0) |
+| `Reveal` | `index?` `delay?` `offset?` — entrance; offset, duration and `stagger(index)` (capped at 7 steps) from `interaction.reveal` |
+| `Skeleton` | `width?` `height?` `radius?`(`shape.well`) `circle?` — `interaction.skeleton`: an `opacity` pulse, or `color` between two palette roles |
 | `Scrim` | `progress`(Animated) `active` `onPress?` `accessibilityLabel?` |
-| `Sheet` | `open` `onClose` `title?` `trailing?` `footer?` `height?` `closeLabel?` — spring up, drag or scrim closes; absolute inside the screen, never `Modal` |
-| `Chip` | `label` `selected?` `onPress?` `size?`('sm'\|'md') `round?` `struck?` `leading?` `accessibilityRole?` |
-| `Button` | `label` `onPress` `variant?`('primary'\|'secondary'\|'outline'\|'ghost'\|'destructive') `size?`('sm'\|'md'\|'lg') `loading?` `leading?` `trailing?` `block?` |
-| `IconButton` | `children`(icon) `onPress` `accessibilityLabel` `variant?`('plain'\|'tonal'\|'filled'\|'translucent'\|'outline') `size?` `badge?` `selected?` |
-| `StateView` | `title` `body?` `actionLabel?` `onAction?` `tone?`('neutral'\|'error') `icon?` `inline?` — empty and error states |
-| `SectionHeader` | `title` `eyebrow?` `action?` `onAction?` |
+| `Sheet` | `open` `onClose` `title?` `trailing?` `footer?` `height?` `closeLabel?` — spring up, drag or scrim closes; absolute inside the screen, never `Modal`; `shape.sheet`, `type.title` |
+| `Chip` | `label` `selected?` `onPress?` `size?`('sm'\|'md') `round?` `struck?` `leading?` `accessibilityRole?` — `shape.chip`, `type.label` |
+| `Button` | `label` `onPress` `variant?`('primary'\|'secondary'\|'outline'\|'ghost'\|'destructive') `size?`('sm'\|'md'\|'lg'\|'xl'; px in `buttonHeight`) `labelRole?`(a `type` role, used as is) `loading?` `leading?` `trailing?` `block?` — `shape.control` |
+| `IconButton` | `children`(icon) `onPress` `accessibilityLabel` `variant?`('plain'\|'tonal'\|'filled'\|'translucent'\|'outline'\|'outline-on-surface') `size?` `badge?`(number\|string\|boolean; a count joins the label) `dot?` `selected?` |
+| `StateView` | `title` `body?` `actionLabel?` `onAction?` `tone?`('neutral'\|'error') `icon?` `badge?`(icon in an `accent` circle) `variant?`('inline'\|'card') `inline?` — empty and error states |
+| `SectionHeader` | `title` `eyebrow?` `action?` `onAction?` — `type.caps`, `type.title`, `type.label` |
+| `Toggle` | `value` `onValueChange` `accessibilityLabel` `size?`('sm'\|'md') `disabled?` `haptic?` — a switch on Press |
+| `Snackbar` | `visible` `message` `actionLabel?` `onAction?` `onDismiss` `bottom?` `duration?`(4000; 0 stays) — inside the screen like `Sheet`; read out by screen readers |
+| `useCountUp` | `useCountUp(target, { duration?, delay?, enabled? })` → number; Reduce Motion or `enabled: false` give `target` at once |
+| `ProductCard` | `product`(`{ id, name, price, currency?, image, compareAt?, badge? }`) `width` `onOpen` `onHeart?` `saved?` `footer?` `badgeSlot?`; `formatPrice(value, currency?)` |
+
+`ProductCard` ships as `components/commerce/ProductCard.tsx`; a component in
+a sub-folder is named by its file (`--only ProductCard`).
 
 The bridge to the host (`components/bridge.ts`) is optional-chained
 everywhere: `bridge()?.ui?.haptic?.('light')`, `bridge()?.ui?.toast?.(…)`,
