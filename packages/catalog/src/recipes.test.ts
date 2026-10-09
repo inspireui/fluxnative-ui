@@ -4,7 +4,7 @@
 // With the kit's tokens every primitive must render and behave exactly like
 // its v0 source: same host views and styles, same hit slop and
 // accessibility, same animations and haptics. With a brand's tokens they
-// must follow the brand. Then the new props, one by one.
+// must follow the brand. Then the new props and recipes, one by one.
 
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -15,11 +15,13 @@ import {
   component,
   dirLayer,
   el,
+  findAll,
   fixtureLayer,
   loader,
   render,
   type Device,
   type Exports,
+  type HostNode,
   type Loader,
   type Props,
   type View,
@@ -335,6 +337,151 @@ test('StateView variant: inline equals the inline prop, card is the block on a c
   assert.equal(allOf(badged, 'Glyph').length, 0, 'the badge takes the icon’s place');
   const inlineBadge = allOf(draw({ variant: 'inline', badge: el('Mark') }), 'View')[2] as View;
   assert.deepEqual([styleOf(inlineBadge).width, styleOf(inlineBadge).borderRadius], [40, 20]);
+});
+
+// -------------------------------------------------------- new recipes
+
+test('useCountUp counts from 0 to the target; enabled: false and Reduce Motion show the target at once', () => {
+  const useCountUp = kit('components/useCountUp.ts').default as (target: number, options?: Props) => number;
+  const probe = (target: number, options?: Props) => el((props: Props) => el('Value', { value: useCountUp(props.target as number, props.options as Props | undefined) }), { target, options });
+  const shown = (rendered: ReturnType<typeof render>) => firstOf(rendered.view, 'Value').props.value;
+
+  const counting = render(kit, probe(42));
+  assert.equal(shown(counting), 0);
+  assert.deepEqual(counting.mount, [['start', { timing: { toValue: 42, duration: 900, delay: 0, easing: { out: 'cubic' }, useNativeDriver: false } }]]);
+  assert.deepEqual(render(kit, probe(42, { duration: 500, delay: 120 })).mount[0], ['start', { timing: { toValue: 42, duration: 500, delay: 120, easing: { out: 'cubic' }, useNativeDriver: false } }]);
+  for (const [options, device] of [[{ enabled: false }, {}], [undefined, { reduced: true }]] as const) {
+    const still = render(kit, probe(42, options), device);
+    assert.equal(shown(still), 42);
+    assert.deepEqual(still.mount, [['setValue', 42]]);
+  }
+});
+
+test('Toggle: a switch on Press with its size, track, knob, 44 px target and the profile haptic', () => {
+  const Toggle = component(kit, 'components/Toggle.tsx');
+  const changes: boolean[] = [];
+  const off = render(kit, el(Toggle, { value: false, onValueChange: (next: boolean) => changes.push(next), accessibilityLabel: 'Notifications' }));
+  const pressable = firstOf(off.view, 'Pressable');
+  assert.deepEqual(
+    [pressable.props.accessibilityRole, pressable.props.accessibilityLabel, pressable.props.accessibilityState, pressable.props.hitSlop],
+    ['switch', 'Notifications', { disabled: false, checked: false }, 7],
+  );
+  assert.deepEqual(changes, [true]);
+  assert.deepEqual(off.presses[0]?.filter((event) => event[0] === 'haptic'), [], 'the kit profile has no haptic');
+  const track = styleOf(allOf(off.view, 'View')[0] as View);
+  assert.deepEqual([track.width, track.height, track.padding, track.borderRadius, track.backgroundColor], [50, 30, 3, 15, light.border]);
+  const [fill, knob] = allOf(off.view, 'Animated.View').slice(1);
+  assert.deepEqual(styleOf(fill as View).backgroundColor, light.primary);
+  const knobStyle = styleOf(knob as View);
+  assert.deepEqual([knobStyle.width, knobStyle.borderRadius, knobStyle.backgroundColor, knobStyle.shadowOpacity], [24, 12, light['primary-foreground'], 0.08]);
+  assert.deepEqual((knobStyle.transform as Array<{ translateX: { interpolate: { outputRange: number[] } } }>)[0]?.translateX.interpolate.outputRange, [0, 20]);
+  assert.deepEqual(off.mount, [['start', { spring: { toValue: 0, useNativeDriver: true, speed: 20, bounciness: 6 } }]]);
+
+  const small = render(kit, el(Toggle, { value: true, onValueChange: noop, accessibilityLabel: 'Wi-Fi', size: 'sm', haptic: 'selection' }));
+  assert.equal(firstOf(small.view, 'Pressable').props.hitSlop, 8);
+  assert.deepEqual([styleOf(allOf(small.view, 'View')[0] as View).width, styleOf(allOf(small.view, 'Animated.View')[2] as View).width], [48, 22]);
+  assert.deepEqual(small.presses[0]?.filter((event) => event[0] === 'haptic'), [['haptic', 'selection']]);
+  const disabled = render(kit, el(Toggle, { value: true, onValueChange: noop, accessibilityLabel: 'Wi-Fi', disabled: true })).view;
+  assert.deepEqual(firstOf(disabled, 'Pressable').props.accessibilityState, { disabled: true, checked: true });
+  assert.equal(styleOf(firstOf(disabled, 'Animated.View')).opacity, 0.45);
+  assert.deepEqual(render(kit, el(Toggle, { value: true, onValueChange: noop, accessibilityLabel: 'Wi-Fi' }), { reduced: true }).mount, [['setValue', 1]]);
+});
+
+test('Snackbar: hidden draws nothing; shown it rises in, is announced, and the action runs then dismisses', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const Snackbar = component(kit, 'components/Snackbar.tsx');
+  assert.deepEqual(render(kit, el(Snackbar, { visible: false, message: 'Removed', onDismiss: noop })).view, []);
+  const calls: string[] = [];
+  const props = { visible: true, message: 'Removed from bag', actionLabel: 'Undo', onAction: () => calls.push('action'), onDismiss: () => calls.push('dismiss') };
+  const shown = render(kit, el(Snackbar, props));
+  const layer = styleOf(firstOf(shown.view, 'Animated.View'));
+  assert.deepEqual([layer.position, layer.left, layer.right, layer.bottom, layer.pointerEvents], ['absolute', 16, 16, 16, 'box-none']);
+  const bar = firstOf(shown.view, 'View');
+  assert.equal(bar.props.accessibilityLiveRegion, 'polite');
+  assert.deepEqual([styleOf(bar).backgroundColor, styleOf(bar).borderRadius, styleOf(bar).paddingRight], [light.inverse, tokens.shape.control, 8]);
+  assert.deepEqual(
+    allOf(shown.view, 'Text').map((text) => [textOf(text), styleOf(text).color]),
+    [
+      ['Removed from bag', light['inverse-foreground']],
+      ['Undo', light['inverse-foreground']],
+    ],
+  );
+  assert.deepEqual(shown.mount.slice(0, 2), [
+    ['start', { timing: { toValue: 1, duration: 250, easing: { bezier: [0.2, 0, 0, 1] }, useNativeDriver: true } }],
+    ['announce', 'Removed from bag'],
+  ]);
+  assert.equal(firstOf(shown.view, 'Pressable').props.accessibilityLabel, 'Undo');
+  assert.deepEqual(calls, ['action', 'dismiss']);
+  // Android and the web read the live region: no second announcement.
+  assert.deepEqual(render(kit, el(Snackbar, props), { os: 'android' }).mount.filter((event) => event[0] === 'announce'), []);
+  // Reduce Motion: it appears where it ends.
+  const still = render(kit, el(Snackbar, props), { reduced: true });
+  assert.deepEqual(still.mount[0], ['setValue', 1]);
+  const rise = styleOf(firstOf(still.view, 'Animated.View')).transform as Array<{ translateY: { interpolate: { outputRange: number[] } } }>;
+  assert.deepEqual(rise[0]?.translateY.interpolate.outputRange, [0, 0]);
+  // No action: no button, even padding.
+  const plainBar = render(kit, el(Snackbar, { visible: true, message: 'Saved', onDismiss: noop, bottom: 96 }));
+  assert.equal(findAll(plainBar.tree, 'Pressable').length, 0);
+  assert.equal(styleOf(firstOf(plainBar.view, 'Animated.View')).bottom, 96);
+  const plainStyle = styleOf(firstOf(plainBar.view, 'View'));
+  assert.deepEqual([plainStyle.paddingHorizontal, plainStyle.paddingRight], [20, undefined]);
+});
+
+test('Snackbar asks to close after its duration; 0 keeps it up', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const Snackbar = component(kit, 'components/Snackbar.tsx');
+  let dismissed = 0;
+  render(kit, el(Snackbar, { visible: true, message: 'Saved', onDismiss: () => (dismissed += 1) }));
+  render(kit, el(Snackbar, { visible: true, message: 'Kept', duration: 0, onDismiss: () => (dismissed += 100) }));
+  // The timeout waits on the platform's recommended length (a promise).
+  await new Promise((resolve) => setImmediate(resolve));
+  t.mock.timers.tick(3999);
+  assert.equal(dismissed, 0);
+  t.mock.timers.tick(1);
+  assert.equal(dismissed, 1);
+  t.mock.timers.tick(60_000);
+  assert.equal(dismissed, 1);
+});
+
+test('ProductCard: image well, price in its currency, struck old price, one name for the card, heart and slots', () => {
+  const card = kit('components/commerce/ProductCard.tsx');
+  const formatPrice = card.formatPrice as (value: number, currency?: string) => string;
+  assert.equal(formatPrice(12.5), '$12.50');
+  assert.equal(formatPrice(1234, 'EUR'), '€1,234.00');
+  assert.equal(formatPrice(3, 'nope'), 'nope 3.00');
+
+  const ProductCard = card.default as (props: Props) => unknown;
+  const product = { id: 'p1', name: 'Linen shirt', price: 89, compareAt: 120, image: 'https://example.com/p1.jpg', badge: 'New' };
+  const opened: unknown[] = [];
+  const hearted: unknown[] = [];
+  const drawn = render(kit, el(ProductCard, { product, width: 160, onOpen: (p: unknown) => opened.push(p), onHeart: (p: unknown) => hearted.push(p), saved: true, footer: el('Footer') }));
+  const [open, heart] = findAll(drawn.tree, 'Pressable') as [HostNode, HostNode];
+  assert.equal(open.props.accessibilityLabel, 'Linen shirt, $89.00, was $120.00, New');
+  assert.equal(open.props.accessibilityRole, 'link');
+  assert.equal(heart.props.accessibilityLabel, 'Remove Linen shirt from saved');
+  assert.deepEqual(heart.props.accessibilityState, { disabled: false, selected: true });
+  assert.deepEqual([opened, hearted], [[product], [product]]);
+
+  const well = styleOf(allOf(drawn.view, 'View')[1] as View);
+  assert.deepEqual([well.height, well.borderRadius, well.backgroundColor, well.overflow], [200, tokens.shape.well, light.muted, 'hidden']);
+  assert.deepEqual(firstOf(drawn.view, 'Image').props.source, { uri: product.image });
+  const [name, price, was, tag] = allOf(drawn.view, 'Text');
+  assert.deepEqual([name && textOf(name), price && textOf(price), was && textOf(was), tag && textOf(tag)], ['Linen shirt', '$89.00', '$120.00', 'NEW']);
+  assert.deepEqual(price && styleOf(price).fontVariant, ['tabular-nums'], 'the price is the numeric role');
+  assert.equal(was && styleOf(was).textDecorationLine, 'line-through');
+  assert.equal(firstOf(drawn.view, 'Path').props.fill, light.tertiary, 'a saved heart is filled with the likes colour');
+  const root = drawn.view[0] as View;
+  assert.deepEqual(
+    root.children.map((child) => (typeof child === 'string' ? child : child.type)),
+    ['Pressable', 'Footer', 'View', 'View'],
+    'footer and heart sit outside the card’s press area',
+  );
+
+  const bare = render(kit, el(ProductCard, { product: { ...product, compareAt: 80, badge: undefined }, width: 100, onOpen: noop, badgeSlot: el('Sale') }));
+  assert.equal(findAll(bare.tree, 'Pressable').length, 1, 'no heart without onHeart');
+  assert.equal(allOf(bare.view, 'Text').length, 2, 'no struck price when compareAt is not higher');
+  assert.equal(allOf(bare.view, 'Sale').length, 1);
+  assert.equal(styleOf(allOf(bare.view, 'View')[1] as View).height, 125);
 });
 
 test('every catalog file imports only react, react-native, react-native-svg and relative paths without an extension', () => {

@@ -8,15 +8,13 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { unifiedDiff } from './diff.ts';
-import { CATALOG_VERSION, FILES_DIR, componentDeps, render, type RenderOptions } from './emit.ts';
+import { CATALOG_VERSION, FILES_DIR, componentDeps, componentPaths, render, type RenderOptions } from './emit.ts';
 import { mergeFile } from './git.ts';
 import { CATALOG_REPO, MANIFEST_FILE, loadManifest, renderManifest, sha256, sortKeys, type Manifest } from './manifest.ts';
 import { loadBrandInput, type BrandInput } from './brand-input.ts';
 import { validateOverrides, type ColorOverrides } from './tokens.ts';
 
 const toPosix = (path: string) => path.split(sep).join('/');
-const isComponent = (path: string) => path.startsWith('components/');
-const componentName = (path: string) => path.replace(/^components\//, '').replace(/\.tsx?$/, '');
 const sorted = (paths: Iterable<string>) => [...new Set(paths)].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 const has = (record: Record<string, unknown>, key: string) => Object.prototype.hasOwnProperty.call(record, key);
 /** `record[key]` for own keys only: paths are data, never `toString` or `constructor`. */
@@ -174,7 +172,7 @@ interface Plan {
 function plan(manifest: Manifest, inputs: TemplateInputs, change: OnlyChange, commit: string | null): Plan {
   const options = renderOptions(inputs, commit);
   const full = render(options);
-  const known = Object.keys(full.files).filter(isComponent).map(componentName);
+  const known = [...componentPaths(Object.keys(full.files)).keys()];
   const { only, warnings } = applyOnly(manifest.inputs.only, change, known);
   const next = only ? render({ ...options, only }) : full;
   const strip = (files: Record<string, string>) => Object.fromEntries(Object.entries(files).filter(([path]) => path !== MANIFEST_FILE));
