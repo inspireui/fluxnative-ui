@@ -8,6 +8,7 @@ import { dirname, join, posix, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { emitIcon } from './icon.ts';
 import { CATALOG_REPO, MANIFEST_FILE, renderManifest, sha256, type Manifest } from './manifest.ts';
+import type { BrandInput } from './brand-input.ts';
 import { emitTokens, validateOverrides, type ColorOverrides } from './tokens.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -138,6 +139,9 @@ export function componentDeps(sources?: Record<string, string>): Record<string, 
 
 export interface RenderOptions {
   overrides?: ColorOverrides;
+  /** A template's brand (`loadBrandInput`), instead of `overrides`; recorded as `inputs.brand*`. */
+  brand?: BrandInput;
+  /** Where the overrides or the brand came from, shown in theme/tokens.ts. */
   overridesLabel?: string;
   /** Component base names to emit (`Press`, `Sheet`); theme files always ship. */
   only?: string[];
@@ -175,14 +179,15 @@ export interface Rendered {
 }
 
 export function render(options: RenderOptions = {}): Rendered {
-  const { overrides, overridesLabel, only, previous } = options;
+  const { overrides, brand, overridesLabel, only, previous } = options;
+  if (overrides && brand) throw new Error('pass colour overrides or a brand, not both: a brand carries its own colours');
   const validated = overrides ? validateOverrides(overrides) : undefined;
   const layer: Record<string, string> = {};
   for (const rel of listFiles()) {
     if (isGenerated(rel)) continue;
     layer[rel] = readFileSync(join(FILES_DIR, rel), 'utf8');
   }
-  layer['theme/tokens.ts'] = emitTokens({ overrides: validated, overridesLabel, colorDescriptions: readColorDescriptions() });
+  layer['theme/tokens.ts'] = emitTokens({ overrides: validated, brand: brand?.brand, overridesLabel, colorDescriptions: readColorDescriptions() });
   layer['components/Icon.tsx'] = emitIcon();
   const owned = new Set([...Object.keys(previous?.forks ?? {}), ...Object.keys(previous?.compositions ?? {})]);
   const files: Record<string, string> = {};
@@ -195,8 +200,9 @@ export function render(options: RenderOptions = {}): Rendered {
     inputs: {
       colors: validated ? sha256(JSON.stringify(validated)) : null,
       colorsPath: validated ? (options.colorsPath ?? null) : null,
-      brand: null,
-      brandPath: null,
+      brand: brand ? brand.hash : null,
+      brandPath: brand ? brand.path : null,
+      brandFiles: brand ? { ...brand.files } : null,
       only: only && only.length ? [...only] : null,
     },
     files: Object.fromEntries(Object.entries(files).map(([path, content]) => [path, sha256(content)])),

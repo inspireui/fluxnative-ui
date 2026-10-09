@@ -109,7 +109,7 @@ its meaning: exit 1 when `emit` would change any byte, the manifest (and its
 {
   "schema": 2,
   "catalog": { "version": "0.1.0", "commit": "10b77de…", "repo": "inspireui/fluxnative-ui" },
-  "inputs": { "colors": "<sha256>", "colorsPath": "../colors.json", "brand": null, "brandPath": null, "only": ["Press", "Icon"] },
+  "inputs": { "colors": "<sha256>", "colorsPath": "../colors.json", "brand": null, "brandPath": null, "brandFiles": null, "only": ["Press", "Icon"] },
   "files": { "components/Press.tsx": "<sha256>" },
   "forks": { "components/Sheet.tsx": { "reason": "own drag handle", "since": "0.1.0", "upstream": "<sha256>" } },
   "compositions": { "components/CtaButton.tsx": { "wraps": "Button", "reason": "60 px checkout CTA" } },
@@ -125,6 +125,12 @@ its meaning: exit 1 when `emit` would change any byte, the manifest (and its
   does not go stale on every commit.
 - `files`: per path, the hash of the catalog copy the file was last synced
   to, header included. A file that matches it is pristine.
+- `inputs.brand*` (with `--brand`): `brandPath` is the argument relative to
+  the files dir (`../design`), `brandFiles` maps every file the brand was
+  read from to the sha256 of its text, and `brand` is the sha256 of the
+  sorted `<path> <sha256>\n` lines. A checker in another language verifies
+  the DNA from `brandFiles` alone; `check` names the brand file that changed
+  and `update` re-renders from it.
 - `forks` and `compositions` are written by the template's owner; `emit` and
   `update` keep them and never write their paths. To fork a primitive, move
   its `files` hash into `forks` as `upstream`, with a `reason` and the catalog
@@ -171,8 +177,30 @@ files and passes it with `--colors`:
   `#rgb`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()` or `transparent`. Unknown
   names and other formats fail the emit with every problem listed.
 
-Nothing else is overridable: spacing, radius and type come from the library,
-which is what keeps templates on one scale.
+`--colors` overrides colours only. A template whose DNA goes further keeps a
+brand file instead, and passes it with `--brand` (the two flags are
+exclusive):
+
+```bash
+node packages/catalog/src/cli.ts emit --to <template>/files --brand <template>/design   # brand.tokens.json (+ brand.dark.tokens.json), or brand.resolver.json
+```
+
+- Overridable through `--brand`: the colour roles (light, and dark in
+  `brand.dark.tokens.json`), `font`, `type`, `shape`, `elevation`,
+  `duration`, `easing`, `interaction` and `layout`, plus the metadata
+  `scheme`, `density`, `haptic` and `skeleton`. The format and an example
+  are in [tokens.md](tokens.md#brand-files-a-templates-dna).
+- Kit-only: spacing (`space`), the `radius`, `text` and `fontWeight` scales,
+  `glass` and `chrome` stay the library's, which keeps every template on one
+  scale. A brand file that sets them fails.
+- The brand is validated first ([rules](tokens.md#validator-rules)): an
+  error stops the emit with every problem listed, warnings are printed. The
+  manifest records it under `inputs.brand`, `brandPath` and `brandFiles`;
+  `update` and `check` reuse `brandPath` when `--brand` is not given.
+- `theme/tokens.ts` appends `font`, `type`, `shape`, `elevation`,
+  `interaction`, `layout` and `density` after `chrome`, with or without a
+  brand; with one, `colors`, `lockedScheme`, `duration` and `easing` carry
+  its values too.
 
 ## Primitives
 

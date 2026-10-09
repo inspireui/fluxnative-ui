@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// fluxnative-catalog emit   --to <files dir> [--colors <json>] [--only A,B] [--check]
-// fluxnative-catalog update --to <files dir> [--colors <json>] [--only A,B | +A,-B] [--dry-run] [--json] [--merge --base-dir <dir>]
-// fluxnative-catalog check  --to <files dir> [--colors <json>] [--only A,B] [--upstream [--strict]]
+// fluxnative-catalog emit   --to <files dir> [--colors <json> | --brand <file|resolver|dir>] [--only A,B] [--check]
+// fluxnative-catalog update --to <files dir> [--colors <json> | --brand <path>] [--only A,B | +A,-B] [--dry-run] [--json] [--merge --base-dir <dir>]
+// fluxnative-catalog check  --to <files dir> [--colors <json> | --brand <path>] [--only A,B] [--upstream [--strict]]
 // fluxnative-catalog build  [--check]   regenerate this package's own files/ (default colours)
 //
 // `emit` writes the layer into a Flux template's `files/` folder (theme/,
@@ -20,6 +20,8 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { CATALOG_VERSION, FILES_DIR, GENERATED, render } from './emit.ts';
 import { catalogCommit } from './git.ts';
 import { MANIFEST_FILE, loadManifest, type Manifest } from './manifest.ts';
+import { formatProblems } from '@fluxnative/tokens/brand';
+import { loadBrandInput, type BrandInput } from './brand-input.ts';
 import { validateOverrides } from './tokens.ts';
 import { checkTemplate, templateDir, update, updateExitCode, type UpdateReport } from './update.ts';
 
@@ -32,9 +34,9 @@ function usage(code: number): never {
   console.error(
     [
       'usage:',
-      '  fluxnative-catalog emit   --to <files dir> [--colors <json>] [--only A,B] [--check]',
-      '  fluxnative-catalog update --to <files dir> [--colors <json>] [--only A,B | +A,-B] [--dry-run] [--json] [--merge --base-dir <dir>]',
-      '  fluxnative-catalog check  --to <files dir> [--colors <json>] [--only A,B] [--upstream [--strict]]',
+      '  fluxnative-catalog emit   --to <files dir> [--colors <json> | --brand <file|resolver|dir>] [--only A,B] [--check]',
+      '  fluxnative-catalog update --to <files dir> [--colors <json> | --brand <path>] [--only A,B | +A,-B] [--dry-run] [--json] [--merge --base-dir <dir>]',
+      '  fluxnative-catalog check  --to <files dir> [--colors <json> | --brand <path>] [--only A,B] [--upstream [--strict]]',
       '  fluxnative-catalog build  [--check]',
     ].join('\n'),
   );
@@ -87,6 +89,12 @@ function writeAll(target: string, files: Record<string, string>, check: boolean)
     console.log(`wrote ${relative(process.cwd(), file)}`);
   }
   return drift;
+}
+
+/** A brand's warnings (errors throw) go to stderr; the emit still runs. */
+function warnBrand(brand: BrandInput): void {
+  const { warnings } = brand.brand;
+  if (warnings.length) console.error(`brand: ${warnings.length} warning(s)\n${formatProblems(warnings)}`);
 }
 
 /** The template's manifest, so `emit` keeps its forks, compositions and selection. */
@@ -146,15 +154,33 @@ if (command === 'build') {
   try {
     const target = templateDir(to);
     const colorsPath = flag(argv, '--colors');
+    const brandPath = flag(argv, '--brand');
+    if (colorsPath && brandPath) {
+      console.error('--colors and --brand are exclusive: a brand carries its own colours (color.* and its .dark.tokens.json)');
+      process.exit(2);
+    }
     const only = flag(argv, '--only')?.split(',').map((s) => s.trim()).filter(Boolean);
     let overrides;
     if (colorsPath) {
       const file = resolve(process.cwd(), colorsPath);
       overrides = validateOverrides(JSON.parse(readFileSync(file, 'utf8')), relative(process.cwd(), file));
     }
-    const label = colorsPath ? toPosix(relative(target, resolve(process.cwd(), colorsPath))) : undefined;
+    let brand: BrandInput | undefined;
+    if (brandPath) {
+      brand = loadBrandInput(brandPath, target);
+      warnBrand(brand);
+    }
+    const label = colorsPath ? toPosix(relative(target, resolve(process.cwd(), colorsPath))) : brand?.path;
     const previous = previousManifest(target);
-    const { files } = render({ overrides, overridesLabel: label, colorsPath: label, only: only ?? previous?.inputs.only ?? undefined, commit: catalogCommit(), previous });
+    const { files } = render({
+      overrides,
+      brand,
+      overridesLabel: label,
+      colorsPath: colorsPath ? label : undefined,
+      only: only ?? previous?.inputs.only ?? undefined,
+      commit: catalogCommit(),
+      previous,
+    });
     const drift = writeAll(target, files, check);
     if (drift) {
       console.error(`${drift} file(s) differ from the catalog layer — re-run \`fluxnative-catalog emit --to ${to}\` or keep the hand edit out of generated files`);
@@ -166,7 +192,7 @@ if (command === 'build') {
     fail(error);
   }
 } else if (command === 'update') {
-  expectArgs(['--to', '--colors', '--only', '--base-dir'], ['--dry-run', '--json', '--merge']);
+  expectArgs(['--to', '--colors', '--brand', '--only', '--base-dir'], ['--dry-run', '--json', '--merge']);
   const to = flag(argv, '--to');
   if (!to) usage(1);
   const json = argv.includes('--json');
@@ -174,6 +200,7 @@ if (command === 'build') {
     const report = update({
       to,
       colors: flag(argv, '--colors'),
+      brand: flag(argv, '--brand'),
       only: flag(argv, '--only'),
       dryRun: argv.includes('--dry-run'),
       merge: argv.includes('--merge'),
@@ -187,7 +214,7 @@ if (command === 'build') {
     fail(error, json);
   }
 } else if (command === 'check') {
-  expectArgs(['--to', '--colors', '--only'], ['--upstream', '--strict', '--check']);
+  expectArgs(['--to', '--colors', '--brand', '--only'], ['--upstream', '--strict', '--check']);
   const to = flag(argv, '--to');
   if (!to) usage(2);
   const upstream = argv.includes('--upstream');
@@ -198,7 +225,7 @@ if (command === 'build') {
   }
   try {
     const target = resolve(process.cwd(), to);
-    const result = checkTemplate({ to, colors: flag(argv, '--colors'), only: flag(argv, '--only'), upstream });
+    const result = checkTemplate({ to, colors: flag(argv, '--colors'), brand: flag(argv, '--brand'), only: flag(argv, '--only'), upstream });
     for (const path of result.missing) console.error(`missing: ${display(join(target, path))}`);
     for (const path of result.stale) console.error(`stale: ${display(join(target, path))}`);
     for (const problem of result.inputs) console.error(`inputs: ${problem}`);

@@ -11,6 +11,7 @@ import { unifiedDiff } from './diff.ts';
 import { CATALOG_VERSION, FILES_DIR, componentDeps, render, type RenderOptions } from './emit.ts';
 import { mergeFile } from './git.ts';
 import { CATALOG_REPO, MANIFEST_FILE, loadManifest, renderManifest, sha256, sortKeys, type Manifest } from './manifest.ts';
+import { loadBrandInput, type BrandInput } from './brand-input.ts';
 import { validateOverrides, type ColorOverrides } from './tokens.ts';
 
 const toPosix = (path: string) => path.split(sep).join('/');
@@ -49,6 +50,14 @@ export interface TemplateInputs {
   overrides?: ColorOverrides;
   /** The overrides file relative to the files dir, or null when there are none. */
   colorsPath: string | null;
+  /** The template's brand, when it has one (exclusive with `overrides`). */
+  brand?: BrandInput;
+}
+
+/** `--colors` and `--brand` as given on the command line, relative to `cwd`. */
+export interface GivenInputs {
+  colors?: string;
+  brand?: string;
 }
 
 function readJson(file: string, label: string): unknown {
@@ -60,11 +69,25 @@ function readJson(file: string, label: string): unknown {
 }
 
 /**
- * `--colors` when given (relative to `cwd`); otherwise the manifest's
- * `colorsPath` (relative to the files dir) when that file exists. Throws when
- * the manifest records overrides whose file can no longer be found.
+ * `--colors` / `--brand` when given (relative to `cwd`); otherwise the
+ * manifest's `colorsPath` / `brandPath` (relative to the files dir) when that
+ * file exists. Throws when the manifest records overrides or a brand whose
+ * file can no longer be found, and when both are given.
  */
-export function resolveInputs(target: string, manifest: Manifest, colors?: string, cwd = process.cwd()): TemplateInputs {
+export function resolveInputs(target: string, manifest: Manifest, given: GivenInputs = {}, cwd = process.cwd()): TemplateInputs {
+  const { colors } = given;
+  if (given.colors !== undefined && given.brand !== undefined) {
+    throw new Error('--colors and --brand are exclusive: a brand carries its own colours (color.* and its .dark.tokens.json)');
+  }
+  if (given.brand !== undefined) {
+    if (!existsSync(resolve(cwd, given.brand))) throw new Error(`--brand: ${given.brand} does not exist`);
+    return { colorsPath: null, brand: loadBrandInput(given.brand, target, cwd) };
+  }
+  if (colors === undefined && manifest.inputs.brandPath !== null) {
+    const recorded = resolve(target, manifest.inputs.brandPath);
+    if (!existsSync(recorded)) throw new Error(`${MANIFEST_FILE} records a brand from ${manifest.inputs.brandPath}, which is gone: restore it or pass --brand`);
+    return { colorsPath: null, brand: loadBrandInput(recorded, target, cwd) };
+  }
   let file: string | undefined;
   if (colors !== undefined) {
     file = resolve(cwd, colors);
@@ -84,6 +107,7 @@ export function resolveInputs(target: string, manifest: Manifest, colors?: strin
 }
 
 function renderOptions(inputs: TemplateInputs, commit: string | null): RenderOptions {
+  if (inputs.brand) return { brand: inputs.brand, overridesLabel: inputs.brand.path, commit };
   const colorsPath = inputs.colorsPath ?? undefined;
   return { overrides: inputs.overrides, overridesLabel: colorsPath, colorsPath, commit };
 }
@@ -175,6 +199,8 @@ export interface UpdateOptions {
   to: string;
   /** `--colors`, relative to `cwd`. Without it the manifest's `colorsPath` is reused. */
   colors?: string;
+  /** `--brand`, relative to `cwd`. Without it the manifest's `brandPath` is reused. */
+  brand?: string;
   /** `--only`: absent keeps the manifest's selection, `A,B` replaces it, `+A,-B` changes it. */
   only?: string;
   /** Report what would happen; write nothing. */
@@ -223,7 +249,7 @@ export function update(options: UpdateOptions): UpdateReport {
   const baseDir = options.baseDir === undefined ? undefined : resolve(cwd, options.baseDir);
   if (baseDir !== undefined && !existsSync(baseDir)) throw new Error(`--base-dir: ${options.baseDir} does not exist`);
   const manifest = requireManifest(target, options.to);
-  const inputs = resolveInputs(target, manifest, options.colors, cwd);
+  const inputs = resolveInputs(target, manifest, { colors: options.colors, brand: options.brand }, cwd);
   const { full, next, manifestInputs, warnings } = plan(manifest, inputs, parseOnly(options.only), options.commit);
   const dryRun = options.dryRun === true;
   const report: UpdateReport = {
@@ -337,6 +363,8 @@ export interface CheckOptions {
   to: string;
   /** `--colors`, relative to `cwd`; without it the manifest's `colorsPath` is used. */
   colors?: string;
+  /** `--brand`, relative to `cwd`; without it the manifest's `brandPath` is used. */
+  brand?: string;
   /** `--only A,B`: must name the manifest's selection. */
   only?: string;
   /** Also render the current catalog and list what `update` would change. */
@@ -375,11 +403,24 @@ export function checkTemplate(options: CheckOptions): CheckResult {
   }
   let inputs: TemplateInputs | undefined;
   try {
-    inputs = resolveInputs(target, manifest, options.colors, cwd);
+    inputs = resolveInputs(target, manifest, { colors: options.colors, brand: options.brand }, cwd);
   } catch (error) {
     result.inputs.push((error as Error).message);
   }
-  if (inputs !== undefined) {
+  if (inputs?.brand) {
+    if (inputs.brand.hash !== manifest.inputs.brand) {
+      const changed = Object.keys({ ...inputs.brand.files, ...(manifest.inputs.brandFiles ?? {}) })
+        .filter((path) => inputs.brand?.files[path] !== manifest.inputs.brandFiles?.[path])
+        .sort();
+      result.inputs.push(
+        manifest.inputs.brand === null
+          ? `brand ${inputs.brand.path} was given, but the files were emitted without one`
+          : `brand ${inputs.brand.path} changed since the files were emitted${changed.length ? ` (${changed.join(', ')})` : ''}: run \`fluxnative-catalog update\``,
+      );
+    }
+  } else if (inputs !== undefined && manifest.inputs.brand !== null) {
+    result.inputs.push(`the files were emitted from brand ${manifest.inputs.brandPath ?? '(unknown path)'}, but this check has none`);
+  } else if (inputs !== undefined) {
     const hash = inputs.overrides ? sha256(JSON.stringify(inputs.overrides)) : null;
     if (hash !== manifest.inputs.colors) {
       result.inputs.push(

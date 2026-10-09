@@ -1,8 +1,9 @@
 // Resolves a Tailwind class string to a React Native style object at runtime,
 // for hosts with no build step (the Flux WebView, Snack). On Expo, Uniwind
 // compiles the same classes; this file accepts the same contract: Tailwind v4
-// names for layout, spacing, radius and type, and FluxNative UI semantic colors
-// only (no `bg-blue-500`, no arbitrary `[...]` values).
+// names for layout, spacing, radius and type, the sys roles (`rounded-card`,
+// `text-body`), and FluxNative UI semantic colors only (no `bg-blue-500`, no
+// arbitrary `[...]` values).
 //
 // Every class it can't read lands in `unknown` with a hint, so a dev warning
 // or the autofixer can name the valid alternative instead of failing quietly.
@@ -15,6 +16,8 @@ import {
   text as textSizes,
   type ColorScheme,
 } from '@fluxnative/tokens';
+// The sys roles by namespace: one of them is called `type`.
+import * as sys from '@fluxnative/tokens';
 
 export type Platform = 'ios' | 'android' | 'web';
 
@@ -47,6 +50,18 @@ const STATIC_COLORS: Record<string, string> = {
 };
 
 const VARIANTS = new Set(['dark', 'light', 'ios', 'android', 'web']);
+
+const kebab = (key: string) => key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+/** `rounded-card`, `rounded-card-inner`: the `shape` roles, from the theme's `--radius-<role>`. */
+const SHAPE_RADII: Record<string, number> = Object.fromEntries(Object.entries(sys.shape).map(([role, px]) => [kebab(role), px]));
+/**
+ * `text-body`, `text-body-sm`: the `type` roles, from the theme's `--text-<role>` and its
+ * line-height, letter-spacing and font-weight. The family and font variant aren't part of a
+ * Tailwind text utility, so they stay in JS (`type.<role>`).
+ */
+const TYPE_ROLES: Record<string, { fontSize: number; lineHeight: number; letterSpacing: number; fontWeight: string }> = Object.fromEntries(
+  Object.entries(sys.type).map(([role, t]) => [kebab(role), { fontSize: t.fontSize, lineHeight: t.lineHeight, letterSpacing: t.letterSpacing, fontWeight: t.fontWeight }]),
+);
 
 const BORDER_SIDES: Record<string, string[]> = {
   '': ['borderWidth'],
@@ -375,7 +390,7 @@ function readClass(cls: string, ctx: Context): Read | undefined {
   if (rounded) {
     const side = rounded[1] ?? '';
     const size = rounded[2] ?? 'DEFAULT';
-    const value = size === 'none' ? 0 : radii[size as keyof typeof radii];
+    const value = size === 'none' ? 0 : (radii[size as keyof typeof radii] ?? SHAPE_RADII[size]);
     if (value === undefined) return undefined;
     return Object.fromEntries((RADIUS_SIDES[side] ?? []).map((p) => [p, value]));
   }
@@ -385,6 +400,8 @@ function readClass(cls: string, ctx: Context): Read | undefined {
     const { fontSize, lineHeight } = textSizes[textSize as keyof typeof textSizes];
     return { fontSize, lineHeight };
   }
+  const role = textSize === undefined ? undefined : TYPE_ROLES[textSize];
+  if (role) return { ...role };
 
   const weight = /^font-(.+)$/.exec(cls)?.[1];
   // React Native wants `fontWeight` as a string ('600'), never a number.
@@ -441,7 +458,8 @@ const cache = new Map<string, Resolved>();
 
 /**
  * Resolves a class string. Later classes win, as in Tailwind source order,
- * except that `leading-*` always wins over the line height of `text-*`, and
+ * except that `leading-*` always wins over the line height of `text-*`
+ * (and `tracking-*` / `font-<weight>` over a `text-<role>`'s), and
  * transforms merge into one `transform` array in CSS order.
  * Variants: `dark:` / `light:` (color scheme) and `ios:` / `android:` / `web:`.
  */
@@ -469,12 +487,15 @@ export function resolve(className: string | undefined, options: ResolveOptions):
     classes.push({ token, cls, applies, badVariant });
     const size = /^text-(.+)$/.exec(cls)?.[1];
     if (applies && size && size in textSizes) fontSize = textSizes[size as keyof typeof textSizes].fontSize;
+    else if (applies && size && TYPE_ROLES[size]) fontSize = TYPE_ROLES[size].fontSize;
   }
 
   // Second pass, in source order so `unknown` reads top to bottom.
   const ctx: Context = { scheme: options.scheme, fontSize, window };
   const transforms = new Map<string, string | number>();
   let leading: StyleValue | undefined;
+  let tracking: StyleValue | undefined;
+  let weight: StyleValue | undefined;
   for (const { token, cls, applies, badVariant } of classes) {
     if (badVariant !== undefined) {
       unknown.push({ className: token, hint: variantHint(badVariant) });
@@ -493,10 +514,16 @@ export function resolve(className: string | undefined, options: ResolveOptions):
       } else style[prop] = value;
     }
     if (cls.startsWith('leading-')) leading = read.lineHeight;
+    if (cls.startsWith('tracking-')) tracking = read.letterSpacing;
+    if (cls.startsWith('font-') && read.fontWeight !== undefined) weight = read.fontWeight;
   }
-  // Tailwind v4 sets `line-height: var(--tw-leading, …)` on `text-*`, so
-  // `leading-*` wins whichever comes first.
+  // Tailwind v4 sets `line-height: var(--tw-leading, …)` on `text-*` (and a
+  // role's letter-spacing and font-weight through `--tw-tracking` and
+  // `--tw-font-weight`), so `leading-*`, `tracking-*` and `font-*` win
+  // whichever comes first.
   if (leading !== undefined) style.lineHeight = leading;
+  if (tracking !== undefined) style.letterSpacing = tracking;
+  if (weight !== undefined) style.fontWeight = weight;
   if (transforms.size > 0) {
     style.transform = [...transforms]
       .sort(([a], [b]) => TRANSFORM_ORDER.indexOf(a) - TRANSFORM_ORDER.indexOf(b))

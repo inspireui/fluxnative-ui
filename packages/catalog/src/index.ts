@@ -12,7 +12,8 @@ export {
   type RenderOptions,
   type Rendered,
 } from './emit.ts';
-export { emitTokens, validateOverrides, resolveColors, COLOR_NAMES, type ColorOverrides } from './tokens.ts';
+export { emitTokens, validateOverrides, resolveColors, loadBrand, kitSources, COLOR_NAMES, type ColorOverrides, type EmitTokensOptions } from './tokens.ts';
+export { loadBrandInput, brandFingerprint, type BrandInput } from './brand-input.ts';
 export { emitIcon } from './icon.ts';
 export {
   MANIFEST_FILE,

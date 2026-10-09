@@ -19,6 +19,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./brand": "./src/brand.ts",
     "./theme.css": "./src/generated/theme.css",
     "./tokens/*": "./tokens/*"
   },

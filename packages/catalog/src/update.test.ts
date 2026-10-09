@@ -308,7 +308,7 @@ test('update migrates a schema 1 template: pristine files gain the header, the m
   const loaded = loadManifest(join(files, MANIFEST_FILE));
   assert.equal(loaded?.schema, 2);
   assert.deepEqual(loaded?.manifest.catalog, { version: CATALOG_VERSION, commit: COMMIT, repo: 'inspireui/fluxnative-ui' });
-  assert.deepEqual(loaded?.manifest.inputs, { colors: colorsHash, colorsPath: '../colors.json', brand: null, brandPath: null, only: ['Press', 'Icon'] });
+  assert.deepEqual(loaded?.manifest.inputs, { colors: colorsHash, colorsPath: '../colors.json', brand: null, brandPath: null, brandFiles: null, only: ['Press', 'Icon'] });
   // From now on the manifest knows where the colours live.
   const again = updateJson(files, [], 0);
   assert.deepEqual(again.written, []);

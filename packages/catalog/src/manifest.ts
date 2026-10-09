@@ -34,10 +34,12 @@ export interface ManifestInputs {
   colors: string | null;
   /** The overrides file, relative to the files dir. */
   colorsPath: string | null;
-  /** sha256 of the brand input, or null. */
+  /** Fingerprint of the brand files (see `brandFiles`), or null when no brand was given. */
   brand: string | null;
-  /** The brand input, relative to the files dir. */
+  /** The `--brand` argument (file, resolver or folder), relative to the files dir. */
   brandPath: string | null;
+  /** Every file the brand was read from, relative to the files dir → sha256 of its bytes. */
+  brandFiles: Record<string, string> | null;
   /** The `--only` selection, or null for everything. */
   only: string[] | null;
 }
@@ -81,7 +83,7 @@ export function upgradeManifest(v1: ManifestV1): Manifest {
   return {
     schema: 2,
     catalog: { version: v1.version, commit: null, repo: CATALOG_REPO },
-    inputs: { colors: v1.colors, colorsPath: null, brand: null, brandPath: null, only: v1.only },
+    inputs: { colors: v1.colors, colorsPath: null, brand: null, brandPath: null, brandFiles: null, only: v1.only },
     files: { ...v1.files },
     forks: {},
     compositions: {},
@@ -140,6 +142,18 @@ function pathMap<T>(where: string, value: unknown, entry: (where: string, value:
   return out;
 }
 
+/** `inputs.brandFiles`: paths relative to the files dir, usually `../design/…`, so `..` is allowed here. */
+function brandFileMap(where: string, value: unknown): Record<string, string> {
+  if (!isObject(value)) throw new ManifestError(`${where}: expected an object of path → sha256`);
+  const out: Record<string, string> = {};
+  for (const [path, item] of Object.entries(value)) {
+    if (path === '' || path.startsWith('/') || /^[a-z]:/i.test(path) || path.includes('\\')) {
+      throw new ManifestError(`${where}: "${path}" is not a relative POSIX path`);
+    }
+    out[path] = hashEntry(`${where}["${path}"]`, item);
+  }
+  return out;
+}
 function hashEntry(where: string, value: unknown): string {
   if (typeof value !== 'string' || !/^[0-9a-f]{64}$/.test(value)) throw new ManifestError(`${where}: expected a sha256 hex digest`);
   return value;
@@ -189,7 +203,7 @@ export function parseManifest(text: string, where = MANIFEST_FILE): { manifest: 
     expectKeys('catalog', doc.catalog, ['version', 'commit', 'repo']);
     const inputs = doc.inputs ?? {};
     if (!isObject(inputs)) throw new ManifestError('inputs: expected an object');
-    expectKeys('inputs', inputs, ['colors', 'colorsPath', 'brand', 'brandPath', 'only']);
+    expectKeys('inputs', inputs, ['colors', 'colorsPath', 'brand', 'brandPath', 'brandFiles', 'only']);
     const applied = doc.applied ?? {};
     if (!isObject(applied)) throw new ManifestError('applied: expected { "codemods" }');
     expectKeys('applied', applied, ['codemods']);
@@ -205,6 +219,7 @@ export function parseManifest(text: string, where = MANIFEST_FILE): { manifest: 
         colorsPath: stringOrNull('inputs.colorsPath', inputs.colorsPath),
         brand: stringOrNull('inputs.brand', inputs.brand),
         brandPath: stringOrNull('inputs.brandPath', inputs.brandPath),
+        brandFiles: inputs.brandFiles === undefined || inputs.brandFiles === null ? null : brandFileMap('inputs.brandFiles', inputs.brandFiles),
         only: stringList('inputs.only', inputs.only),
       },
       files: pathMap('files', doc.files, hashEntry),
@@ -250,6 +265,7 @@ export function renderManifest(manifest: Manifest): string {
       colorsPath: manifest.inputs.colorsPath,
       brand: manifest.inputs.brand,
       brandPath: manifest.inputs.brandPath,
+      brandFiles: manifest.inputs.brandFiles === null ? null : sortKeys(manifest.inputs.brandFiles),
       only: manifest.inputs.only,
     },
     files: sortKeys(manifest.files),
