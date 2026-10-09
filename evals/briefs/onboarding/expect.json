@@ -1,0 +1,4 @@
+{
+  "recipes": ["Chip", "Button", "Icon", "Reveal", "Skeleton", "StateView"],
+  "states": ["live", "loading", "empty", "error"]
+}
