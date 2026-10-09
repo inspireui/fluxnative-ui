@@ -9,6 +9,8 @@ export type ColorName =
   | 'background'
   /** Primary text and icons on background. */
   | 'foreground'
+  /** Secondary text that must stay readable: softer than foreground, stronger than muted-foreground. */
+  | 'foreground-soft'
   /** Raised content surface (cards, cells). */
   | 'card'
   /** Text on card. */
@@ -17,6 +19,10 @@ export type ColorName =
   | 'popover'
   /** Text on popover. */
   | 'popover-foreground'
+  /** Inverted surface: snackbars, toasts, a selected chip. */
+  | 'inverse'
+  /** Text and icons on inverse. */
+  | 'inverse-foreground'
   /** Brand / main action. */
   | 'primary'
   /** Text and icons on primary. */
@@ -25,6 +31,10 @@ export type ColorName =
   | 'secondary'
   /** Text on secondary. */
   | 'secondary-foreground'
+  /** Third hue: likes, tags, highlights. */
+  | 'tertiary'
+  /** Text and icons on tertiary. */
+  | 'tertiary-foreground'
   /** Quiet fill: inputs, skeletons, grouped backgrounds. */
   | 'muted'
   /** Secondary text. */
@@ -39,10 +49,16 @@ export type ColorName =
   | 'destructive-foreground'
   /** Positive status. */
   | 'success'
+  /** Text and icons on a success fill. */
+  | 'success-foreground'
   /** Caution status. */
   | 'warning'
+  /** Text and icons on a warning fill. */
+  | 'warning-foreground'
   /** Hairlines and outlines. */
   | 'border'
+  /** Faint dividers, sheet handles, inactive dots. */
+  | 'border-soft'
   /** Text field outline. */
   | 'input'
   /** Focus ring. */
@@ -66,14 +82,19 @@ export const colors: { readonly [S in ColorScheme]: Palette } = {
   "light": {
     "background": "#ffffff",
     "foreground": "#0a0a0b",
+    "foreground-soft": "#3c3c43",
     "card": "#ffffff",
     "card-foreground": "#0a0a0b",
     "popover": "#ffffff",
     "popover-foreground": "#0a0a0b",
+    "inverse": "#0a0a0b",
+    "inverse-foreground": "#ffffff",
     "primary": "#007aff",
     "primary-foreground": "#ffffff",
     "secondary": "#f2f2f7",
     "secondary-foreground": "#0a0a0b",
+    "tertiary": "#5856d6",
+    "tertiary-foreground": "#ffffff",
     "muted": "#f2f2f7",
     "muted-foreground": "#6e6e73",
     "accent": "#e9e9ee",
@@ -81,8 +102,11 @@ export const colors: { readonly [S in ColorScheme]: Palette } = {
     "destructive": "#ff3b30",
     "destructive-foreground": "#ffffff",
     "success": "#34c759",
+    "success-foreground": "#0a0a0b",
     "warning": "#ff9500",
+    "warning-foreground": "#0a0a0b",
     "border": "rgba(60, 60, 67, 0.18)",
+    "border-soft": "rgba(60, 60, 67, 0.1)",
     "input": "rgba(60, 60, 67, 0.18)",
     "ring": "#007aff",
     "scrim": "rgba(0, 0, 0, 0.4)",
@@ -95,14 +119,19 @@ export const colors: { readonly [S in ColorScheme]: Palette } = {
   "dark": {
     "background": "#000000",
     "foreground": "#f5f5f7",
+    "foreground-soft": "#c7c7cc",
     "card": "#1c1c1e",
     "card-foreground": "#f5f5f7",
     "popover": "#2c2c2e",
     "popover-foreground": "#f5f5f7",
+    "inverse": "#f5f5f7",
+    "inverse-foreground": "#000000",
     "primary": "#0a84ff",
     "primary-foreground": "#ffffff",
     "secondary": "#2c2c2e",
     "secondary-foreground": "#f5f5f7",
+    "tertiary": "#5e5ce6",
+    "tertiary-foreground": "#ffffff",
     "muted": "#1c1c1e",
     "muted-foreground": "#98989f",
     "accent": "#2c2c2e",
@@ -110,8 +139,11 @@ export const colors: { readonly [S in ColorScheme]: Palette } = {
     "destructive": "#ff453a",
     "destructive-foreground": "#ffffff",
     "success": "#30d158",
+    "success-foreground": "#0a0a0b",
     "warning": "#ff9f0a",
+    "warning-foreground": "#0a0a0b",
     "border": "rgba(84, 84, 88, 0.6)",
+    "border-soft": "rgba(84, 84, 88, 0.32)",
     "input": "rgba(84, 84, 88, 0.6)",
     "ring": "#0a84ff",
     "scrim": "rgba(0, 0, 0, 0.55)",

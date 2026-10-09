@@ -16,7 +16,7 @@
     "components/Skeleton.tsx": "9a40ce7341d8b35814dbacb1956501c0e321e3bc95ab8a8bfd6e47c7a698e0cb",
     "components/StateView.tsx": "f3986e39e7a09f849733383683d1d37c88f4b0b85c595a540f31ebf215ce8515",
     "components/useReducedMotion.ts": "c7db8397eb8c27a209ce8a650ca43b7ed99dde84c406e6629719d98a1b4ec123",
-    "theme/tokens.ts": "3c84f7987d079b9a7d0a6d770ac590d839f1863530d92c305691a6a678514611",
+    "theme/tokens.ts": "f44f1d90a66d45882cecdf5b10012967c526a44a2aa2ecfb86adae339a7e18df",
     "theme/usePalette.ts": "e6f716a3ea7c0118c3b958f1134290585c92bde9c7b95641970d922366c28d7a"
   }
 }

@@ -26,6 +26,18 @@
       },
       "$description": "Primary text and icons on background."
     },
+    "foreground-soft": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2353,
+          0.2353,
+          0.2627
+        ],
+        "hex": "#3c3c43"
+      },
+      "$description": "Secondary text that must stay readable: softer than foreground, stronger than muted-foreground."
+    },
     "card": {
       "$value": {
         "colorSpace": "srgb",
@@ -74,6 +86,14 @@
       },
       "$description": "Text on popover."
     },
+    "inverse": {
+      "$value": "{color.foreground}",
+      "$description": "Inverted surface: snackbars, toasts, a selected chip."
+    },
+    "inverse-foreground": {
+      "$value": "{color.background}",
+      "$description": "Text and icons on inverse."
+    },
     "primary": {
       "$value": {
         "colorSpace": "srgb",
@@ -121,6 +141,30 @@
         "hex": "#0a0a0b"
       },
       "$description": "Text on secondary."
+    },
+    "tertiary": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3451,
+          0.3373,
+          0.8392
+        ],
+        "hex": "#5856d6"
+      },
+      "$description": "Third hue: likes, tags, highlights."
+    },
+    "tertiary-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1,
+          1,
+          1
+        ],
+        "hex": "#ffffff"
+      },
+      "$description": "Text and icons on tertiary."
     },
     "muted": {
       "$value": {
@@ -206,6 +250,18 @@
       },
       "$description": "Positive status."
     },
+    "success-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0392,
+          0.0392,
+          0.0431
+        ],
+        "hex": "#0a0a0b"
+      },
+      "$description": "Text and icons on a success fill."
+    },
     "warning": {
       "$value": {
         "colorSpace": "srgb",
@@ -217,6 +273,18 @@
         "hex": "#ff9500"
       },
       "$description": "Caution status."
+    },
+    "warning-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0392,
+          0.0392,
+          0.0431
+        ],
+        "hex": "#0a0a0b"
+      },
+      "$description": "Text and icons on a warning fill."
     },
     "border": {
       "$value": {
@@ -230,6 +298,19 @@
         "alpha": 0.18
       },
       "$description": "Hairlines and outlines."
+    },
+    "border-soft": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2353,
+          0.2353,
+          0.2627
+        ],
+        "hex": "#3c3c43",
+        "alpha": 0.1
+      },
+      "$description": "Faint dividers, sheet handles, inactive dots."
     },
     "input": {
       "$value": {
