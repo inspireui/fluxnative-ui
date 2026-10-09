@@ -131,6 +131,7 @@ pnpm tokens:check  # the same, failing on drift (CI runs it)
 pnpm test          # node:test suites (tokens, glass, class resolver, icons, catalog) + jest render tests (ui)
 pnpm typecheck
 pnpm catalog emit --to <template>/files [--colors <template>/colors.json]   # the catalog layer into a Flux template
+pnpm catalog update --to <template>/files [--dry-run] [--json]   # bring a template to the current catalog; hand edits are reported, never overwritten
 ```
 
 Before a pull request, read [CONTRIBUTING.md](CONTRIBUTING.md): checks, changesets, DCO sign-off and the [API stability policy](docs/topics/versioning.md). Coding agents start with [AGENTS.md](AGENTS.md). Report vulnerabilities privately ([SECURITY.md](SECURITY.md)).

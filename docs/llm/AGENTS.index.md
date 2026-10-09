@@ -79,4 +79,4 @@ export default function Home() {
 |Expo Router setup|`docs/topics/expo-router.md`|
 |Flux WebView, runtime styling|`docs/topics/runtime.md`|
 |Android chrome, iOS-only props|`docs/topics/android.md`|
-|Flux templates: emit tokens, Icon and primitives into a template|`docs/topics/catalog.md`|
+|Flux templates: emit, `update` and `check` the catalog layer (tokens, Icon, primitives); forks in `.fluxnative-ui.json`|`docs/topics/catalog.md`|
