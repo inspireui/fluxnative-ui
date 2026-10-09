@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildModel } from './model.ts';
 import { emitTs } from './emit-ts.ts';
+import { emitCss } from './emit-css.ts';
 import { emitSysTs, sysTokens } from './sys.ts';
 
 const read = (name: string): unknown => JSON.parse(readFileSync(new URL(`../tokens/${name}`, import.meta.url), 'utf8'));
@@ -39,4 +40,14 @@ test('the generated tokens.ts appends the sys sections after chrome', () => {
   const chrome = src.indexOf('export const chrome');
   assert.ok(chrome > 0 && src.indexOf('export const font = ') > chrome && src.trimEnd().endsWith('} as const;'));
   assert.equal(readFileSync(new URL('./generated/tokens.ts', import.meta.url), 'utf8'), src, 'run `pnpm tokens`');
+});
+
+test('the CSS theme appends rounded-<shape> and text-<role> variables', () => {
+  const css = emitCss(model);
+  const sys = css.slice(css.lastIndexOf('@theme {'));
+  assert.ok(css.indexOf('@layer theme') < css.lastIndexOf('@theme {'), 'after the colour theme');
+  assert.match(sys, /--radius-card-inner: 12px;/);
+  assert.match(sys, /--text-body-sm: 14px;\n {2}--text-body-sm--line-height: 20px;\n {2}--text-body-sm--letter-spacing: 0px;\n {2}--text-body-sm--font-weight: 400;/);
+  assert.match(sys, /--text-caps--letter-spacing: 1\.2px;/);
+  assert.doesNotMatch(sys, /^ {2}--font-/m, 'families stay in JS');
 });

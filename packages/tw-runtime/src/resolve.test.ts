@@ -151,3 +151,46 @@ test('font weights are strings, as React Native requires', () => {
   assert.equal(typeof fontWeight, 'string');
   assert.equal(fontWeight, '700');
 });
+
+test('rounded-<shape> reads the shape roles, on every side', () => {
+  assert.deepEqual(resolve('rounded-card', light).style, { borderRadius: 16 });
+  assert.deepEqual(resolve('rounded-card-inner', light).style, { borderRadius: 12 });
+  assert.deepEqual(resolve('rounded-t-sheet', light).style, { borderTopLeftRadius: 24, borderTopRightRadius: 24 });
+  assert.deepEqual(resolve('rounded-control', light).style, { borderRadius: 9999 });
+  assert.equal(resolve('rounded-cardInner', light).unknown.length, 1);
+});
+
+test('text-<role> sets size, line height, tracking and weight', () => {
+  assert.deepEqual(resolve('text-body', light).style, { fontSize: 16, lineHeight: 24, letterSpacing: 0, fontWeight: '400' });
+  assert.deepEqual(resolve('text-caps uppercase', light).style, {
+    fontSize: 11,
+    lineHeight: 14,
+    letterSpacing: 1.2,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  });
+  assert.deepEqual(resolve('text-body-sm text-muted-foreground', light).style, {
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0,
+    fontWeight: '400',
+    color: '#6e6e73',
+  });
+  assert.equal(resolve('text-subtitle', light).unknown.length, 1);
+});
+
+test('leading-*, tracking-* and font-* win over a text role, in either order', () => {
+  assert.equal(resolve('font-bold text-label', light).style.fontWeight, '700');
+  assert.equal(resolve('text-label font-bold', light).style.fontWeight, '700');
+  // tracking is relative to the role's size: 0.025em × 11px.
+  assert.equal(resolve('tracking-wide text-caps', light).style.letterSpacing, 0.275);
+  assert.equal(resolve('text-body leading-tight', light).style.lineHeight, 20);
+});
+
+test('the v0.1 colour roles are classes', () => {
+  assert.equal(resolve('bg-inverse', light).style.backgroundColor, '#0a0a0b');
+  assert.equal(resolve('text-inverse-foreground', dark).style.color, '#000000');
+  assert.equal(resolve('text-foreground-soft', light).style.color, '#3c3c43');
+  assert.equal(resolve('border-border-soft', light).style.borderColor, 'rgba(60, 60, 67, 0.1)');
+  assert.equal(resolve('bg-tertiary/50', light).style.backgroundColor, 'rgba(88, 86, 214, 0.5)');
+});

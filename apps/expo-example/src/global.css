@@ -124,3 +124,47 @@
     }
   }
 }
+
+/* Sys roles: rounded-<shape>, and text-<role> with its line height, tracking and weight. */
+@theme {
+  --radius-control: 9999px;
+  --radius-card: 16px;
+  --radius-card-inner: 12px;
+  --radius-sheet: 24px;
+  --radius-chip: 9999px;
+  --radius-avatar: 9999px;
+  --radius-field: 12px;
+  --radius-well: 8px;
+  --text-display: 30px;
+  --text-display--line-height: 36px;
+  --text-display--letter-spacing: -0.5px;
+  --text-display--font-weight: 700;
+  --text-headline: 24px;
+  --text-headline--line-height: 32px;
+  --text-headline--letter-spacing: -0.3px;
+  --text-headline--font-weight: 700;
+  --text-title: 20px;
+  --text-title--line-height: 28px;
+  --text-title--letter-spacing: -0.2px;
+  --text-title--font-weight: 700;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body--letter-spacing: 0px;
+  --text-body--font-weight: 400;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--letter-spacing: 0px;
+  --text-body-sm--font-weight: 400;
+  --text-label: 14px;
+  --text-label--line-height: 20px;
+  --text-label--letter-spacing: 0px;
+  --text-label--font-weight: 500;
+  --text-caps: 11px;
+  --text-caps--line-height: 14px;
+  --text-caps--letter-spacing: 1.2px;
+  --text-caps--font-weight: 600;
+  --text-numeric: 16px;
+  --text-numeric--line-height: 24px;
+  --text-numeric--letter-spacing: 0px;
+  --text-numeric--font-weight: 600;
+}
