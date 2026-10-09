@@ -83,4 +83,5 @@ export default function Home() {
 |Flux WebView, runtime styling|`docs/topics/runtime.md`|
 |Android chrome, iOS-only props|`docs/topics/android.md`|
 |Flux templates: emit, `update` and `check` the catalog layer (tokens, Icon, primitives); forks in `.fluxnative-ui.json`|`docs/topics/catalog.md`|
+|AI pack for Flux templates: `flux.ai` host contract, useAiChat/useAiTask, StreamingText, Composer, MessageList, ScanFrame|`docs/topics/ai.md`|
 |API stability: what changes in a minor vs a major, deprecation windows|`docs/topics/versioning.md`|

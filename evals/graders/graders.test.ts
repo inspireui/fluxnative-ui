@@ -233,19 +233,24 @@ describe('props', () => {
 
   test('reads the prop table from the catalog sources', () => {
     assert.deepEqual([...catalog.components.keys()].sort(), [
+      'AiBadge',
       'Button',
       'Chip',
+      'Composer',
       'Icon',
       'IconButton',
+      'MessageList',
       'Press',
       'ProductCard',
       'Reveal',
+      'ScanFrame',
       'Scrim',
       'SectionHeader',
       'Sheet',
       'Skeleton',
       'Snackbar',
       'StateView',
+      'StreamingText',
       'Toggle',
     ]);
     const button = catalog.components.get('Button');

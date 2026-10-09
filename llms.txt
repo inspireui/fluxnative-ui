@@ -15,7 +15,9 @@
 - [Expo Router setup](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/expo-router.md): `FluxStack`, `FluxTabs`, and what renders as native iOS bars
 - [Runtime styling](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/runtime.md): `styleEngine="runtime"` and `useClassStyle` for hosts with no build step (Flux WebView, Expo Snack), and the classes the resolver reads
 - [Android](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/android.md): system bars, chrome shapes, iOS-only props that Android ignores
-- [Catalog layer](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/catalog.md): emitting the tokens, `Icon` and primitives into a Flux template
+- [Catalog layer](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/catalog.md): emitting the tokens, `Icon`, primitives and recipes into a Flux template, and keeping them current with `update`
+- [Catalog index for models](https://github.com/inspireui/fluxnative-ui/blob/main/docs/llm/CATALOG.index.md): the ≤ 8 KB index to read before writing a Flux template screen
+- [AI pack](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/ai.md): the `flux.ai` host contract, `useAiChat` / `useAiTask`, and the streaming, composer, message list and scan components
 - [Versioning and API stability](https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/versioning.md): what may change between releases, and how deprecations work
 
 ## Optional

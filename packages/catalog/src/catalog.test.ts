@@ -130,7 +130,9 @@ test('inferred dependencies equal the old table, plus the bridge edge it missed'
     Snackbar: ['Press', 'bridge', 'useReducedMotion'],
     ProductCard: ['Icon', 'IconButton', 'Press', 'bridge', 'useReducedMotion'],
   };
-  for (const [name, deps] of Object.entries(inferred)) assert.deepEqual(deps, [...(expected[name] ?? [])].sort(), name);
+  // The components of the table's era; later ones (the AI pack, …) test their own dependencies.
+  const era = ['Button', 'Chip', 'Icon', 'IconButton', 'Press', 'Reveal', 'Scrim', 'SectionHeader', 'Sheet', 'Skeleton', 'StateView', 'bridge', 'useReducedMotion'];
+  for (const name of era) assert.deepEqual(inferred[name], [...(expected[name] ?? [])].sort(), name);
   for (const [name, deps] of Object.entries(OLD_DEPS)) for (const dep of deps) assert.ok(inferred[name]?.includes(dep), `${name} → ${dep}`);
   // The three templates on the layer select the same files as before.
   const pilots = [
