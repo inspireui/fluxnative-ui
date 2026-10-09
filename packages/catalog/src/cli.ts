@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// fluxnative-catalog emit  --to <template files dir> [--colors <overrides.json>] [--only Press,Sheet,…] [--check]
-// fluxnative-catalog check --to <template files dir> [--colors …] [--only …]     (alias of emit --check)
+// fluxnative-catalog emit  --to <template files dir> [--colors <overrides.json> | --brand <brand.tokens.json|*.resolver.json|dir>] [--only Press,Sheet,…] [--check]
+// fluxnative-catalog check --to <template files dir> [--colors … | --brand …] [--only …]     (alias of emit --check)
 // fluxnative-catalog build [--check]   regenerate this package's own files/ (default colours)
 //
 // `emit` writes the layer into a Flux template's `files/` folder (theme/,
@@ -12,14 +12,15 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { FILES_DIR, GENERATED, render } from './emit.ts';
 import { MANIFEST_FILE, readManifest } from './manifest.ts';
-import { validateOverrides } from './tokens.ts';
+import { loadBrand, validateOverrides } from './tokens.ts';
+import { formatProblems } from '@fluxnative/tokens';
 
 function usage(code: number): never {
   console.error(
     [
       'usage:',
-      '  fluxnative-catalog emit  --to <files dir> [--colors <json>] [--only A,B] [--check]',
-      '  fluxnative-catalog check --to <files dir> [--colors <json>] [--only A,B]',
+      '  fluxnative-catalog emit  --to <files dir> [--colors <json> | --brand <path>] [--only A,B] [--check]',
+      '  fluxnative-catalog check --to <files dir> [--colors <json> | --brand <path>] [--only A,B]',
       '  fluxnative-catalog build [--check]',
     ].join('\n'),
   );
@@ -76,8 +77,24 @@ if (command === 'build') {
     const file = resolve(process.cwd(), colorsPath);
     overrides = validateOverrides(JSON.parse(readFileSync(file, 'utf8')), relative(process.cwd(), file));
   }
+  const brandPath = flag(argv, '--brand');
+  if (colorsPath && brandPath) {
+    console.error('--colors and --brand are exclusive: a brand file carries its own colours (color.* and its .dark.tokens.json)');
+    process.exit(2);
+  }
+  let brand;
+  if (brandPath) {
+    try {
+      brand = loadBrand(brandPath);
+    } catch (e) {
+      console.error(e instanceof Error ? e.message : String(e));
+      process.exit(1);
+    }
+    if (brand.warnings.length) console.error(`brand: ${brand.warnings.length} warning(s)\n${formatProblems(brand.warnings)}`);
+  }
+  const labelPath = colorsPath ?? brandPath;
   const previous = readManifest(join(target, MANIFEST_FILE));
-  const { files } = render({ overrides, overridesLabel: colorsPath ? relative(target, resolve(process.cwd(), colorsPath)) : undefined, only: only ?? previous?.only ?? undefined });
+  const { files } = render({ overrides, brand, overridesLabel: labelPath ? relative(target, resolve(process.cwd(), labelPath)) : undefined, only: only ?? previous?.only ?? undefined });
   const drift = writeAll(target, files, check);
   if (drift) {
     console.error(`${drift} file(s) differ from the catalog layer — re-run \`fluxnative-catalog emit --to ${to}\` or keep the hand edit out of generated files`);

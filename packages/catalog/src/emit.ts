@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { emitIcon } from './icon.ts';
 import { MANIFEST_FILE, renderManifest, sha256, type Manifest } from './manifest.ts';
 import { emitTokens, validateOverrides, type ColorOverrides } from './tokens.ts';
+import type { ResolvedBrand } from '@fluxnative/tokens';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const PACKAGE_ROOT = join(here, '..');
@@ -59,6 +60,8 @@ function readColorDescriptions(): Record<string, string> {
 
 export interface RenderOptions {
   overrides?: ColorOverrides;
+  /** A resolved brand (`loadBrand`) instead of `overrides`. */
+  brand?: ResolvedBrand;
   overridesLabel?: string;
   /** Component base names to emit (`Press`, `Sheet`); theme files always ship. */
   only?: string[];
@@ -92,18 +95,18 @@ export interface Rendered {
   manifest: Manifest;
 }
 
-export function render({ overrides, overridesLabel, only }: RenderOptions = {}): Rendered {
+export function render({ overrides, brand, overridesLabel, only }: RenderOptions = {}): Rendered {
   const validated = overrides ? validateOverrides(overrides) : undefined;
   const files: Record<string, string> = {};
   for (const rel of selectFiles(listFiles(), only)) {
     if ((GENERATED as readonly string[]).includes(rel)) continue;
     files[rel] = readFileSync(join(FILES_DIR, rel), 'utf8');
   }
-  files['theme/tokens.ts'] = emitTokens({ overrides: validated, overridesLabel, colorDescriptions: readColorDescriptions() });
+  files['theme/tokens.ts'] = emitTokens({ overrides: validated, brand, overridesLabel, colorDescriptions: readColorDescriptions() });
   if (!only || only.includes('Icon')) files['components/Icon.tsx'] = emitIcon();
   const manifest: Manifest = {
     version,
-    colors: validated ? sha256(JSON.stringify(validated)) : null,
+    colors: validated ? sha256(JSON.stringify(validated)) : brand ? sha256(JSON.stringify(brand.sources.map((s) => s.doc))) : null,
     only: only && only.length ? [...only] : null,
     files: Object.fromEntries(Object.entries(files).map(([path, content]) => [path, sha256(content)])),
   };
