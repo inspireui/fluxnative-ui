@@ -24,7 +24,10 @@
   },
   "files": [
     "src",
-    "tokens"
+    "tokens",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/**/__tests__"
   ],
   "sideEffects": [
     "*.css"

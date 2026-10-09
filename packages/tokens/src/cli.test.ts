@@ -65,7 +65,8 @@ test('the bin runs from an installed copy under node_modules', () =>
     // Node refuses to strip types under node_modules; the bin must not rely on it.
     const installed = join(dir, 'node_modules', '@fluxnative', 'tokens');
     mkdirSync(installed, { recursive: true });
-    for (const entry of ['package.json', ...pkg.files]) {
+    // `files` also lists negated globs (tests stay out of the tarball); copy the plain entries.
+    for (const entry of ['package.json', ...pkg.files.filter((f: string) => !f.startsWith('!'))]) {
       cpSync(join(PACKAGE_ROOT, entry), join(installed, entry), { recursive: true });
     }
     const result = cli(['global-css', '--out', 'src/global.css'], dir, installed);

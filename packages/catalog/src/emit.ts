@@ -40,9 +40,10 @@ export function listFiles(): string[] {
 
 function readColorDescriptions(): Record<string, string> {
   // The DTCG source carries each colour's description; the generated TS only
-  // has it as JSDoc. Resolve the light scheme file through the tokens package.
-  const tokensDir = join(PACKAGE_ROOT, 'node_modules', '@fluxnative', 'tokens', 'tokens');
-  const file = join(tokensDir, 'color.light.tokens.json');
+  // has it as JSDoc. Resolve the light scheme file through the tokens
+  // package's exports, so an npm install (hoisted, not nested under this
+  // package) emits the same bytes as the monorepo.
+  const file = fileURLToPath(import.meta.resolve('@fluxnative/tokens/tokens/color.light.tokens.json'));
   if (!existsSync(file)) return {};
   const doc = JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
   const out: Record<string, string> = {};
