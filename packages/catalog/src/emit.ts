@@ -3,7 +3,7 @@
 // generated for the template's colours. Pure: returns path → content.
 
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, posix, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { emitIcon } from './icon.ts';
 import { MANIFEST_FILE, renderManifest, sha256, type Manifest } from './manifest.ts';
@@ -57,6 +57,63 @@ function readColorDescriptions(): Record<string, string> {
   return out;
 }
 
+const isGenerated = (rel: string) => (GENERATED as readonly string[]).includes(rel);
+const isComponent = (rel: string) => rel.startsWith('components/');
+const componentName = (rel: string) => rel.replace(/^components\//, '').replace(/\.tsx?$/, '');
+
+// `import X from './Y'`, `import type { X } from '../theme/Y'`, `import './Y'`,
+// `export { X } from './Y'`, including imports that span several lines.
+const IMPORT_RE = /^[ \t]*(?:import|export)\s+(?:[^'"`;]*?\s+from\s+)?['"]([^'"]+)['"]/gm;
+
+function resolveImport(from: string, specifier: string, known: Set<string>): string | undefined {
+  const base = posix.normalize(posix.join(posix.dirname(from), specifier));
+  return [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`, `${base}/index.tsx`].find((candidate) => known.has(candidate));
+}
+
+/** The relative imports between the layer's files: path → the layer paths it imports. */
+export function importGraph(sources: Record<string, string>): Record<string, string[]> {
+  const known = new Set(Object.keys(sources));
+  const graph: Record<string, string[]> = {};
+  for (const [rel, text] of Object.entries(sources)) {
+    const deps = new Set<string>();
+    for (const match of text.matchAll(IMPORT_RE)) {
+      const specifier = match[1];
+      if (specifier === undefined || !/^\.\.?\//.test(specifier)) continue;
+      const target = resolveImport(rel, specifier, known);
+      if (target === undefined) throw new Error(`${rel} imports '${specifier}', which is not a file of the catalog layer`);
+      deps.add(target);
+    }
+    graph[rel] = [...deps].sort();
+  }
+  return graph;
+}
+
+function closure(start: string[], graph: Record<string, string[]>): Set<string> {
+  const seen = new Set<string>();
+  const queue = [...start];
+  for (let rel = queue.pop(); rel !== undefined; rel = queue.pop()) {
+    if (seen.has(rel)) continue;
+    seen.add(rel);
+    queue.push(...(graph[rel] ?? []));
+  }
+  return seen;
+}
+
+function readLayerFile(rel: string): string {
+  return readFileSync(join(FILES_DIR, rel), 'utf8');
+}
+
+/** Each component's transitive dependencies inside `components/`, by name (theme files always ship). */
+export function componentDeps(sources?: Record<string, string>): Record<string, string[]> {
+  const layer = sources ?? Object.fromEntries(listFiles().map((rel) => [rel, readLayerFile(rel)]));
+  const graph = importGraph(layer);
+  const out: Record<string, string[]> = {};
+  for (const rel of Object.keys(layer).filter(isComponent).sort()) {
+    out[componentName(rel)] = [...closure([rel], graph)].filter((dep) => dep !== rel && isComponent(dep)).map(componentName).sort();
+  }
+  return out;
+}
+
 export interface RenderOptions {
   overrides?: ColorOverrides;
   overridesLabel?: string;
@@ -64,27 +121,20 @@ export interface RenderOptions {
   only?: string[];
 }
 
-/** Which relative paths `--only` keeps. */
-export function selectFiles(all: string[], only?: string[]): string[] {
+/**
+ * Which relative paths `--only` keeps: the named components, everything they
+ * import (followed transitively through the layer's relative imports) and
+ * every theme file. `read` returns a path's source and defaults to this
+ * package's `files/`.
+ */
+export function selectFiles(all: string[], only?: string[], read: (rel: string) => string = readLayerFile): string[] {
   if (!only || only.length === 0) return all;
-  const wanted = new Set(only);
-  const known = new Set(all.filter((f) => f.startsWith('components/')).map((f) => f.replace(/^components\//, '').replace(/\.tsx?$/, '')));
+  const known = new Map(all.filter(isComponent).map((rel) => [componentName(rel), rel]));
   const unknown = only.filter((name) => !known.has(name));
-  if (unknown.length) throw new Error(`--only: unknown component(s) ${unknown.join(', ')}. Known: ${[...known].join(', ')}`);
-  // Primitives lean on each other: keep the files a selected one imports.
-  const deps: Record<string, string[]> = {
-    Press: ['bridge', 'useReducedMotion'],
-    Reveal: ['useReducedMotion'],
-    Skeleton: ['useReducedMotion'],
-    Sheet: ['Scrim', 'useReducedMotion'],
-    Chip: ['Press', 'bridge', 'useReducedMotion'],
-    Button: ['Press', 'bridge', 'useReducedMotion'],
-    IconButton: ['Press', 'bridge', 'useReducedMotion'],
-    SectionHeader: ['Press', 'bridge', 'useReducedMotion'],
-    StateView: ['Button', 'Press', 'bridge', 'useReducedMotion'],
-  };
-  for (const name of only) for (const dep of deps[name] ?? []) wanted.add(dep);
-  return all.filter((f) => !f.startsWith('components/') || wanted.has(f.replace(/^components\//, '').replace(/\.tsx?$/, '')));
+  if (unknown.length) throw new Error(`--only: unknown component(s) ${unknown.join(', ')}. Known: ${[...known.keys()].join(', ')}`);
+  const graph = importGraph(Object.fromEntries(all.map((rel) => [rel, read(rel)])));
+  const keep = closure(only.flatMap((name) => known.get(name) ?? []), graph);
+  return all.filter((rel) => !isComponent(rel) || keep.has(rel));
 }
 
 export interface Rendered {
@@ -94,13 +144,15 @@ export interface Rendered {
 
 export function render({ overrides, overridesLabel, only }: RenderOptions = {}): Rendered {
   const validated = overrides ? validateOverrides(overrides) : undefined;
-  const files: Record<string, string> = {};
-  for (const rel of selectFiles(listFiles(), only)) {
-    if ((GENERATED as readonly string[]).includes(rel)) continue;
-    files[rel] = readFileSync(join(FILES_DIR, rel), 'utf8');
+  const layer: Record<string, string> = {};
+  for (const rel of listFiles()) {
+    if (isGenerated(rel)) continue;
+    layer[rel] = readFileSync(join(FILES_DIR, rel), 'utf8');
   }
-  files['theme/tokens.ts'] = emitTokens({ overrides: validated, overridesLabel, colorDescriptions: readColorDescriptions() });
-  if (!only || only.includes('Icon')) files['components/Icon.tsx'] = emitIcon();
+  layer['theme/tokens.ts'] = emitTokens({ overrides: validated, overridesLabel, colorDescriptions: readColorDescriptions() });
+  layer['components/Icon.tsx'] = emitIcon();
+  const files: Record<string, string> = {};
+  for (const rel of selectFiles(Object.keys(layer).sort(), only, (path) => layer[path] ?? '')) files[rel] = layer[rel] ?? '';
   const manifest: Manifest = {
     version,
     colors: validated ? sha256(JSON.stringify(validated)) : null,

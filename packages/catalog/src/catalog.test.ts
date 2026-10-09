@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { listFiles, render, selectFiles } from './emit.ts';
+import { componentDeps, importGraph, listFiles, render, selectFiles } from './emit.ts';
 import { emitIcon } from './icon.ts';
 import { readManifest, sha256 } from './manifest.ts';
 import { COLOR_NAMES, emitTokens, resolveColors, validateOverrides } from './tokens.ts';
@@ -91,4 +91,57 @@ test('cli emit writes the layer, check passes, a hand edit fails check', () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// The table `selectFiles` used before dependencies were inferred from imports.
+const OLD_DEPS: Record<string, string[]> = {
+  Press: ['bridge', 'useReducedMotion'],
+  Reveal: ['useReducedMotion'],
+  Skeleton: ['useReducedMotion'],
+  Sheet: ['Scrim', 'useReducedMotion'],
+  Chip: ['Press', 'bridge', 'useReducedMotion'],
+  Button: ['Press', 'bridge', 'useReducedMotion'],
+  IconButton: ['Press', 'bridge', 'useReducedMotion'],
+  SectionHeader: ['Press', 'bridge', 'useReducedMotion'],
+  StateView: ['Button', 'Press', 'bridge', 'useReducedMotion'],
+};
+
+function oldSelectFiles(all: string[], only: string[]): string[] {
+  const wanted = new Set(only);
+  for (const name of only) for (const dep of OLD_DEPS[name] ?? []) wanted.add(dep);
+  return all.filter((f) => !f.startsWith('components/') || wanted.has(f.replace(/^components\//, '').replace(/\.tsx?$/, '')));
+}
+
+test('inferred dependencies equal the old table, plus the bridge edge it missed', () => {
+  const inferred = componentDeps();
+  // useReducedMotion imports ./bridge, which the table left out: `--only Reveal`
+  // used to emit a useReducedMotion.ts whose import did not resolve.
+  const expected: Record<string, string[]> = {
+    ...OLD_DEPS,
+    Reveal: ['bridge', 'useReducedMotion'],
+    Skeleton: ['bridge', 'useReducedMotion'],
+    Sheet: ['Scrim', 'bridge', 'useReducedMotion'],
+    useReducedMotion: ['bridge'],
+  };
+  for (const [name, deps] of Object.entries(inferred)) assert.deepEqual(deps, [...(expected[name] ?? [])].sort(), name);
+  for (const [name, deps] of Object.entries(OLD_DEPS)) for (const dep of deps) assert.ok(inferred[name]?.includes(dep), `${name} → ${dep}`);
+  // The three templates on the layer select the same files as before.
+  const pilots = [
+    ['Press', 'Reveal', 'Skeleton', 'Sheet', 'Chip', 'Button', 'IconButton', 'StateView', 'Icon'],
+    ['Press', 'Reveal', 'Skeleton', 'Scrim', 'IconButton', 'StateView', 'Icon'],
+    ['Press', 'Reveal', 'Skeleton', 'Icon'],
+  ];
+  for (const only of pilots) assert.deepEqual(selectFiles(listFiles(), only), oldSelectFiles(listFiles(), only));
+  assert.ok(selectFiles(listFiles(), ['Reveal']).includes('components/bridge.ts'));
+});
+
+test('importGraph follows multi-line, type-only and re-export imports and rejects one that leaves the layer', () => {
+  const graph = importGraph({
+    'components/A.tsx': "import React from 'react';\nimport {\n  b,\n} from './B';\nimport type { T } from '../theme/T';\nexport { c } from './C';\nconst s = './D';\n",
+    'components/B.ts': '',
+    'components/C.ts': '',
+    'theme/T.ts': '',
+  });
+  assert.deepEqual(graph['components/A.tsx'], ['components/B.ts', 'components/C.ts', 'theme/T.ts']);
+  assert.throws(() => importGraph({ 'components/A.tsx': "import X from './Missing';\n" }), /imports '\.\/Missing', which is not a file of the catalog layer/);
 });
