@@ -13,7 +13,8 @@
     "changeset": "changeset",
     "release": "turbo run build && changeset publish",
     "tokens:check": "node packages/tokens/src/build.ts --check --global-css apps/expo-example/src/global.css && node packages/glass/src/build-hosts.ts --check && node packages/catalog/src/cli.ts build --check",
-    "catalog": "node packages/catalog/src/cli.ts"
+    "catalog": "node packages/catalog/src/cli.ts",
+    "eval": "node evals/runner/run.ts"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.0",
