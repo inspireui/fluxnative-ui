@@ -1,0 +1,73 @@
+{
+  "$description": "Dark colours of the test fixture: every role the light colours set, plus the inks they need.",
+  "color": {
+    "$type": "color",
+    "primary": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5059,
+          0.7804,
+          0.5176
+        ],
+        "hex": "#81c784"
+      }
+    },
+    "primary-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.0431,
+          0.1216,
+          0.0471
+        ],
+        "hex": "#0b1f0c"
+      }
+    },
+    "foreground-soft": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7804,
+          0.7804,
+          0.8
+        ],
+        "hex": "#c7c7cc"
+      }
+    },
+    "destructive": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.949,
+          0.7216,
+          0.7098
+        ],
+        "hex": "#f2b8b5"
+      }
+    },
+    "destructive-foreground": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3765,
+          0.0784,
+          0.0627
+        ],
+        "hex": "#601410"
+      }
+    },
+    "border": {
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3294,
+          0.3294,
+          0.3451
+        ],
+        "alpha": 0.6,
+        "hex": "#545458"
+      }
+    }
+  }
+}
