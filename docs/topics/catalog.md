@@ -57,8 +57,29 @@ files and passes it with `--colors`:
   `#rgb`, `#rrggbb`, `#rrggbbaa`, `rgb()`, `rgba()` or `transparent`. Unknown
   names and other formats fail the emit with every problem listed.
 
-Nothing else is overridable: spacing, radius and type come from the library,
-which is what keeps templates on one scale.
+`--colors` overrides colours only. A template whose DNA goes further keeps a
+brand file instead, and passes it with `--brand` (the two flags are
+exclusive):
+
+```bash
+node packages/catalog/src/cli.ts emit --to <template>/files --brand <template>/design   # brand.tokens.json (+ brand.dark.tokens.json), or brand.resolver.json
+```
+
+- Overridable through `--brand`: the colour roles (light, and dark in
+  `brand.dark.tokens.json`), `font`, `type`, `shape`, `elevation`,
+  `duration`, `easing`, `interaction` and `layout`, plus the metadata
+  `scheme`, `density`, `haptic` and `skeleton`. The format and an example
+  are in [tokens.md](tokens.md#brand-files-a-templates-dna).
+- Kit-only: spacing (`space`), the `radius`, `text` and `fontWeight` scales,
+  `glass` and `chrome` stay the library's, which keeps every template on one
+  scale. A brand file that sets them fails.
+- The brand is validated first ([rules](tokens.md#validator-rules)): an
+  error stops the emit with every problem listed, warnings are printed. The
+  manifest records the brand's hash where it records a colours file's.
+- `theme/tokens.ts` appends `font`, `type`, `shape`, `elevation`,
+  `interaction`, `layout` and `density` after `chrome`, with or without a
+  brand; with one, `colors`, `lockedScheme`, `duration` and `easing` carry
+  its values too.
 
 ## Primitives
 

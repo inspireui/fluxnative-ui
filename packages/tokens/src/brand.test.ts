@@ -386,3 +386,12 @@ test('every problem is reported in one run, and resolveBrand lists them', () => 
     (e: unknown) => e instanceof BrandError && e.problems.length >= 4 && /^brand: 4 errors\n {2}error {3}/.test(e.message),
   );
 });
+
+test('the example in docs/topics/tokens.md is the passing fixture', (t) => {
+  const docs = join(import.meta.dirname, '..', '..', '..', 'docs', 'topics', 'tokens.md');
+  if (!existsSync(docs)) return t.skip('docs are not shipped with the package');
+  const example = /### Example\n\n```json\n([\s\S]*?)\n```/.exec(readFileSync(docs, 'utf8'))?.[1];
+  assert.ok(example, 'docs/topics/tokens.md has an ### Example json block');
+  const { $description: _d, ...fixture } = readJson(join(fixtures, 'brand.tokens.json')) as Doc;
+  assert.deepEqual(JSON.parse(example), fixture);
+});
