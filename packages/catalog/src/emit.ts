@@ -1,12 +1,13 @@
 // Renders the whole catalog layer for one target: the static primitives
 // copied from `files/`, plus `theme/tokens.ts` and `components/Icon.tsx`
-// generated for the template's colours. Pure: returns path → content.
+// generated for the template's colours, each with a header that names it.
+// Pure: returns path → content.
 
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, posix, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { emitIcon } from './icon.ts';
-import { MANIFEST_FILE, renderManifest, sha256, type Manifest } from './manifest.ts';
+import { CATALOG_REPO, MANIFEST_FILE, renderManifest, sha256, type Manifest } from './manifest.ts';
 import { emitTokens, validateOverrides, type ColorOverrides } from './tokens.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -16,7 +17,10 @@ export const FILES_DIR = join(PACKAGE_ROOT, 'files');
 
 export const GENERATED = ['theme/tokens.ts', 'components/Icon.tsx'] as const;
 
-const version = (JSON.parse(readFileSync(join(PACKAGE_ROOT, 'package.json'), 'utf8')) as { version: string }).version;
+/** Where every emitted file sends its reader. */
+export const DOCS_URL = 'https://github.com/inspireui/fluxnative-ui/blob/main/docs/topics/catalog.md';
+
+export const CATALOG_VERSION = (JSON.parse(readFileSync(join(PACKAGE_ROOT, 'package.json'), 'utf8')) as { version: string }).version;
 
 function walk(dir: string, base = dir): string[] {
   const out: string[] = [];
@@ -60,6 +64,23 @@ function readColorDescriptions(): Record<string, string> {
 const isGenerated = (rel: string) => (GENERATED as readonly string[]).includes(rel);
 const isComponent = (rel: string) => rel.startsWith('components/');
 const componentName = (rel: string) => rel.replace(/^components\//, '').replace(/\.tsx?$/, '');
+
+/**
+ * The lines `render()` puts at the top of every emitted source under
+ * `components/` and `theme/`: what the file is and where its docs live, then,
+ * for a copied primitive, where a change belongs. A generated file keeps its
+ * own "do not edit by hand" header right below the first line. No version
+ * number, so a release that leaves a file alone leaves its bytes alone.
+ */
+export function emittedHeader(rel: string): string {
+  const first = `// FluxNative UI catalog · ${rel} · ${DOCS_URL}\n`;
+  if (isGenerated(rel)) return first;
+  return `${first}// Emitted by fluxnative-catalog — declare a fork in ${MANIFEST_FILE} instead of editing.\n\n`;
+}
+
+function withHeader(rel: string, content: string): string {
+  return /^(components|theme)\/.+\.tsx?$/.test(rel) ? emittedHeader(rel) + content : content;
+}
 
 // `import X from './Y'`, `import type { X } from '../theme/Y'`, `import './Y'`,
 // `export { X } from './Y'`, including imports that span several lines.
@@ -119,6 +140,16 @@ export interface RenderOptions {
   overridesLabel?: string;
   /** Component base names to emit (`Press`, `Sheet`); theme files always ship. */
   only?: string[];
+  /** The overrides file, relative to the files dir; recorded as `inputs.colorsPath`. */
+  colorsPath?: string;
+  /** `catalog.commit` for the manifest. Default null, which is what this package's own copy records. */
+  commit?: string | null;
+  /**
+   * The template's current manifest. Its `forks`, `compositions` and
+   * `applied` carry over, and forked or composed paths are left out of
+   * `files`: they belong to the template.
+   */
+  previous?: Manifest | null;
 }
 
 /**
@@ -142,7 +173,8 @@ export interface Rendered {
   manifest: Manifest;
 }
 
-export function render({ overrides, overridesLabel, only }: RenderOptions = {}): Rendered {
+export function render(options: RenderOptions = {}): Rendered {
+  const { overrides, overridesLabel, only, previous } = options;
   const validated = overrides ? validateOverrides(overrides) : undefined;
   const layer: Record<string, string> = {};
   for (const rel of listFiles()) {
@@ -151,13 +183,25 @@ export function render({ overrides, overridesLabel, only }: RenderOptions = {}):
   }
   layer['theme/tokens.ts'] = emitTokens({ overrides: validated, overridesLabel, colorDescriptions: readColorDescriptions() });
   layer['components/Icon.tsx'] = emitIcon();
+  const owned = new Set([...Object.keys(previous?.forks ?? {}), ...Object.keys(previous?.compositions ?? {})]);
   const files: Record<string, string> = {};
-  for (const rel of selectFiles(Object.keys(layer).sort(), only, (path) => layer[path] ?? '')) files[rel] = layer[rel] ?? '';
+  for (const rel of selectFiles(Object.keys(layer).sort(), only, (path) => layer[path] ?? '')) {
+    if (!owned.has(rel)) files[rel] = withHeader(rel, layer[rel] ?? '');
+  }
   const manifest: Manifest = {
-    version,
-    colors: validated ? sha256(JSON.stringify(validated)) : null,
-    only: only && only.length ? [...only] : null,
+    schema: 2,
+    catalog: { version: CATALOG_VERSION, commit: options.commit ?? null, repo: CATALOG_REPO },
+    inputs: {
+      colors: validated ? sha256(JSON.stringify(validated)) : null,
+      colorsPath: validated ? (options.colorsPath ?? null) : null,
+      brand: null,
+      brandPath: null,
+      only: only && only.length ? [...only] : null,
+    },
     files: Object.fromEntries(Object.entries(files).map(([path, content]) => [path, sha256(content)])),
+    forks: { ...previous?.forks },
+    compositions: { ...previous?.compositions },
+    applied: { codemods: [...(previous?.applied.codemods ?? [])] },
   };
   files[MANIFEST_FILE] = renderManifest(manifest);
   return { files, manifest };

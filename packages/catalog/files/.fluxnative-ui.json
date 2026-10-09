@@ -1,22 +1,37 @@
 {
-  "version": "0.0.0",
-  "colors": null,
-  "only": null,
+  "schema": 2,
+  "catalog": {
+    "version": "0.0.0",
+    "commit": null,
+    "repo": "inspireui/fluxnative-ui"
+  },
+  "inputs": {
+    "colors": null,
+    "colorsPath": null,
+    "brand": null,
+    "brandPath": null,
+    "only": null
+  },
   "files": {
-    "components/bridge.ts": "bfd1ef980134e6334e379371e8921eede541c9d2f98d01ca5e300c6538173618",
-    "components/Button.tsx": "f2bfe7b5b4d860c6d2aaedf9ddefaaf6309d7077dd213ed321a20f29cdfd148c",
-    "components/Chip.tsx": "f2da363034b71484c4f4c716ea0b4ab98f772f9722347c60afde21387dca9a32",
-    "components/Icon.tsx": "301a5dc3dd175778f344b794714bda927b5c53614afcb5b1425796e2a38bf5e4",
-    "components/IconButton.tsx": "c6ed0323e54c2b63b9825629e99f99d4d0c7244d51c5033e4dfc83640bf06158",
-    "components/Press.tsx": "55e2411f00ee494aac1189864c2f04309aaab62555f87d7f92e28bc7f983fde2",
-    "components/Reveal.tsx": "43fbd7935c61442528e9a75a494681fb066338fbf03b7d7dcfb1a6c97b8a694c",
-    "components/Scrim.tsx": "1c036214d81c23b3c1568d8562ae3dee6d446a2910bf36bc032774a4246e8674",
-    "components/SectionHeader.tsx": "0a90de0ffcc6595e9f1fa78d6e21168b93729d179322f6640951a8dd2fbcb42b",
-    "components/Sheet.tsx": "d1987d2c73e9bde4d7f2691958247f5c4e1b942699a54d8ee55ac68ee6d556cd",
-    "components/Skeleton.tsx": "9a40ce7341d8b35814dbacb1956501c0e321e3bc95ab8a8bfd6e47c7a698e0cb",
-    "components/StateView.tsx": "f3986e39e7a09f849733383683d1d37c88f4b0b85c595a540f31ebf215ce8515",
-    "components/useReducedMotion.ts": "c7db8397eb8c27a209ce8a650ca43b7ed99dde84c406e6629719d98a1b4ec123",
-    "theme/tokens.ts": "3c84f7987d079b9a7d0a6d770ac590d839f1863530d92c305691a6a678514611",
-    "theme/usePalette.ts": "e6f716a3ea7c0118c3b958f1134290585c92bde9c7b95641970d922366c28d7a"
+    "components/Button.tsx": "c95bb17421361075efbd0f93c138bfa1f5031e60242b28f34b25788558abd244",
+    "components/Chip.tsx": "e45755f0a0a62db8969f1b8b55cb799717537ec024fcd90405f3b14cad93139e",
+    "components/Icon.tsx": "539f2a5f15f12324f6c6be7546a77452226a17418d3f2ac73c65647aeace9599",
+    "components/IconButton.tsx": "28612025d0127b5c78fca7614c052c2ecf95ebf9e0f148e1cd27d14718d8d26a",
+    "components/Press.tsx": "893ee9a6ecc009dee8ff06ca494dce40c9ae214a1319936d3d97b0872ed02620",
+    "components/Reveal.tsx": "93656b9c586b867161629b4f42d95a47cfbac00597f51c75c002ad8c7613521a",
+    "components/Scrim.tsx": "2dfb5d9a7b1f6bcec4f946b2ccb745b63f600907bdae4905298721963dac9d24",
+    "components/SectionHeader.tsx": "49c58a1028ab5c8818337b3d308d27a989626c034e280c3846de113e40fa6d8c",
+    "components/Sheet.tsx": "16c0e338d48d7b8d994bf68ad5d158bda3284c6b9beb257e0f7fcbf0860f755a",
+    "components/Skeleton.tsx": "6669c25d7b7369df184d5a18edcbe55683d7672349e87b95137138875541ece3",
+    "components/StateView.tsx": "a27576d7ca83a33e2e04bffaab9580e08d759babe7f5e7101de56f5b34fef1c4",
+    "components/bridge.ts": "c0fad4cfc528d744aeeab86ea6b38d2f6ad9209e1ea39a104810818a0edab6e1",
+    "components/useReducedMotion.ts": "bd5b48c5ebd5c8798abca01631110faf9def88e9b5c595ca3b9f1cfad3aadce0",
+    "theme/tokens.ts": "485e9321c2b1096d931979e93cc46bd7d90a8df67c7705a575766724ab76ae2e",
+    "theme/usePalette.ts": "e895f5db61f9ab9eff8d916429e13a5c0865d1434eb52c50df4a12cf106d956e"
+  },
+  "forks": {},
+  "compositions": {},
+  "applied": {
+    "codemods": []
   }
 }
