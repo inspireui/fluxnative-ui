@@ -34,7 +34,7 @@ export function gradeProps(screen: Screen, catalog: Catalog): GradeResult<PropsD
   let spreads = 0;
   const unknown = new Set<string>();
   for (const base of screen.componentImports.values()) {
-    if (!catalog.files.some((file) => file.replace(/\.[jt]sx?$/, '') === `components/${base}`)) unknown.add(base);
+    if (!catalog.files.some((file) => file.startsWith('components/') && file.replace(/\.[jt]sx?$/, '').split('/').pop() === base)) unknown.add(base);
   }
 
   for (const tag of jsxTags(screen.sf)) {

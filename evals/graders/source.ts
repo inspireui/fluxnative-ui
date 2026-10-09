@@ -41,7 +41,7 @@ export function parseScreen(code: string): Screen {
 export function componentModule(spec: string): string | null {
   if (!spec.startsWith('.')) return null;
   const rel = posix.normalize(posix.join(SCREEN_DIR, spec));
-  const match = /^components\/([^/]+?)(?:\.[jt]sx?)?$/.exec(rel);
+  const match = /^components\/(?:[^/]+\/)?([^/]+?)(?:\.[jt]sx?)?$/.exec(rel);
   return match?.[1] ?? null;
 }
 

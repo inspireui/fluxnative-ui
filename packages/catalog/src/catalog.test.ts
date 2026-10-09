@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { DOCS_URL, FILES_DIR, GENERATED, componentDeps, importGraph, listFiles, render, selectFiles } from './emit.ts';
+import { DOCS_URL, FILES_DIR, GENERATED, componentDeps, componentName, componentPaths, importGraph, listFiles, render, selectFiles } from './emit.ts';
 import { emitIcon } from './icon.ts';
 import { CATALOG_INDEX_LIMIT, renderCatalogIndex } from './catalog-index.ts';
 import { MANIFEST_FILE, loadManifest, parseManifest, readManifest, renderManifest, sha256 } from './manifest.ts';
@@ -124,6 +124,11 @@ test('inferred dependencies equal the old table, plus the bridge edge it missed'
     Skeleton: ['bridge', 'useReducedMotion'],
     Sheet: ['Scrim', 'bridge', 'useReducedMotion'],
     useReducedMotion: ['bridge'],
+    // Recipes added after the table.
+    useCountUp: ['bridge', 'useReducedMotion'],
+    Toggle: ['Press', 'bridge', 'useReducedMotion'],
+    Snackbar: ['Press', 'bridge', 'useReducedMotion'],
+    ProductCard: ['Icon', 'IconButton', 'Press', 'bridge', 'useReducedMotion'],
   };
   for (const [name, deps] of Object.entries(inferred)) assert.deepEqual(deps, [...(expected[name] ?? [])].sort(), name);
   for (const [name, deps] of Object.entries(OLD_DEPS)) for (const dep of deps) assert.ok(inferred[name]?.includes(dep), `${name} → ${dep}`);
@@ -135,6 +140,46 @@ test('inferred dependencies equal the old table, plus the bridge edge it missed'
   ];
   for (const only of pilots) assert.deepEqual(selectFiles(listFiles(), only), oldSelectFiles(listFiles(), only));
   assert.ok(selectFiles(listFiles(), ['Reveal']).includes('components/bridge.ts'));
+});
+
+test('a component in a sub-folder is named by its file: --only, deps, emit, check and update handle it', () => {
+  assert.equal(componentName('components/commerce/ProductCard.tsx'), 'ProductCard');
+  assert.equal(componentName('components/useCountUp.ts'), 'useCountUp');
+  assert.equal(componentPaths(listFiles()).get('ProductCard'), 'components/commerce/ProductCard.tsx');
+  assert.throws(() => componentPaths(['components/Card.tsx', 'components/commerce/Card.tsx']), /two catalog components are named Card: components\/Card\.tsx and components\/commerce\/Card\.tsx/);
+  assert.throws(() => componentDeps({ 'components/Card.tsx': '', 'components/shop/Card.tsx': '' }), /two catalog components are named Card/);
+  // A sub-folder file reaches its siblings and the theme through `../` and `../../`.
+  assert.deepEqual(importGraph({ 'components/shop/A.tsx': "import B from '../B';\nimport { t } from '../../theme/T';\n", 'components/B.tsx': '', 'theme/T.ts': '' })['components/shop/A.tsx'], [
+    'components/B.tsx',
+    'theme/T.ts',
+  ]);
+  assert.deepEqual(selectFiles(listFiles(), ['ProductCard']), [
+    'components/Icon.tsx',
+    'components/IconButton.tsx',
+    'components/Press.tsx',
+    'components/bridge.ts',
+    'components/commerce/ProductCard.tsx',
+    'components/useReducedMotion.ts',
+    'theme/tokens.ts',
+    'theme/usePalette.ts',
+  ]);
+
+  const dir = mkdtempSync(join(tmpdir(), 'fluxnative-catalog-subfolder-'));
+  try {
+    const files = join(dir, 'files');
+    execFileSync('node', [CLI, 'emit', '--to', files, '--only', 'ProductCard'], { stdio: 'pipe' });
+    const card = readFileSync(join(files, 'components/commerce/ProductCard.tsx'), 'utf8');
+    assert.ok(card.startsWith(`// FluxNative UI catalog · components/commerce/ProductCard.tsx · ${DOCS_URL}\n`));
+    const manifest = readManifest(join(files, MANIFEST_FILE));
+    assert.deepEqual(manifest?.inputs.only, ['ProductCard']);
+    assert.equal(manifest?.files['components/commerce/ProductCard.tsx'], sha256(card));
+    assert.match(execFileSync('node', [CLI, 'check', '--to', files], { encoding: 'utf8' }), /up to date with its manifest/);
+    const added = JSON.parse(execFileSync('node', [CLI, 'update', '--to', files, '--only', '+Toggle', '--json'], { encoding: 'utf8' }));
+    assert.deepEqual(added.written, ['components/Toggle.tsx']);
+    assert.deepEqual(readManifest(join(files, MANIFEST_FILE))?.inputs.only, ['ProductCard', 'Toggle']);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('importGraph follows multi-line, type-only and re-export imports and rejects one that leaves the layer', () => {

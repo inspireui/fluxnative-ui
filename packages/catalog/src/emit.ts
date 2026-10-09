@@ -64,8 +64,22 @@ function readColorDescriptions(): Record<string, string> {
 }
 
 const isGenerated = (rel: string) => (GENERATED as readonly string[]).includes(rel);
+/** A path under `components/`, sub-folders included (`components/commerce/ProductCard.tsx`). */
 const isComponent = (rel: string) => rel.startsWith('components/');
-const componentName = (rel: string) => rel.replace(/^components\//, '').replace(/\.tsx?$/, '');
+/** A component's name is its file's base name: `components/commerce/ProductCard.tsx` → `ProductCard`. */
+export const componentName = (rel: string) => posix.basename(rel).replace(/\.tsx?$/, '');
+
+/** Component name → path. Two components with one name would make `--only` ambiguous, so that throws. */
+export function componentPaths(paths: string[]): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const rel of paths.filter(isComponent)) {
+    const name = componentName(rel);
+    const taken = out.get(name);
+    if (taken !== undefined) throw new Error(`two catalog components are named ${name}: ${taken} and ${rel}`);
+    out.set(name, rel);
+  }
+  return out;
+}
 
 /**
  * The lines `render()` puts at the top of every emitted source under
@@ -131,8 +145,8 @@ export function componentDeps(sources?: Record<string, string>): Record<string, 
   const layer = sources ?? Object.fromEntries(listFiles().map((rel) => [rel, readLayerFile(rel)]));
   const graph = importGraph(layer);
   const out: Record<string, string[]> = {};
-  for (const rel of Object.keys(layer).filter(isComponent).sort()) {
-    out[componentName(rel)] = [...closure([rel], graph)].filter((dep) => dep !== rel && isComponent(dep)).map(componentName).sort();
+  for (const [name, rel] of componentPaths(Object.keys(layer).sort())) {
+    out[name] = [...closure([rel], graph)].filter((dep) => dep !== rel && isComponent(dep)).map(componentName).sort();
   }
   return out;
 }
@@ -165,7 +179,7 @@ export interface RenderOptions {
  */
 export function selectFiles(all: string[], only?: string[], read: (rel: string) => string = readLayerFile): string[] {
   if (!only || only.length === 0) return all;
-  const known = new Map(all.filter(isComponent).map((rel) => [componentName(rel), rel]));
+  const known = componentPaths(all);
   const unknown = only.filter((name) => !known.has(name));
   if (unknown.length) throw new Error(`--only: unknown component(s) ${unknown.join(', ')}. Known: ${[...known.keys()].join(', ')}`);
   const graph = importGraph(Object.fromEntries(all.map((rel) => [rel, read(rel)])));

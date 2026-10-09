@@ -238,12 +238,15 @@ describe('props', () => {
       'Icon',
       'IconButton',
       'Press',
+      'ProductCard',
       'Reveal',
       'Scrim',
       'SectionHeader',
       'Sheet',
       'Skeleton',
+      'Snackbar',
       'StateView',
+      'Toggle',
     ]);
     const button = catalog.components.get('Button');
     assert.ok(button && !button.open);

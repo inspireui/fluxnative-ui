@@ -25,19 +25,22 @@ Prefer retrieval-led reasoning over pre-training-led reasoning: this layer is ne
 ### Components (default exports)
 |component|props (`?` optional; closed values in parentheses)|
 |---|---|
-|`Button`|label onPress?(fn) variant?('primary'\|'secondary'\|'outline'\|'ghost'\|'destructive') size?('sm'\|'md'\|'lg') disabled? loading? leading?(node) trailing?(node) block? haptic?('none'\|'light'\|'selection'\|'medium') accessibilityLabel?|
+|`Button`|label onPress?(fn) variant?('primary'\|'secondary'\|'outline'\|'ghost'\|'destructive') size?('sm'\|'md'\|'lg'\|'xl') labelRole?(TypeRole) disabled? loading? leading?(node) trailing?(node) block? haptic?('none'\|'light'\|'selection'\|'medium') accessibilityLabel?|
 |`Chip`|label selected? onPress?(fn) size?('sm'\|'md') round? struck? disabled? leading?(node) accessibilityRole?('button'\|'radio'\|'checkbox'\|'tab') accessibilityLabel?|
-|`IconButton`|children(node) onPress?(fn) accessibilityLabel accessibilityHint? variant?('plain'\|'tonal'\|'filled'\|'translucent'\|'outline') size?('sm'\|'md'\|'lg') disabled? badge?(number \| string) selected? haptic?('none'\|'light'\|'selection'\|'medium')|
+|`IconButton`|children(node) onPress?(fn) accessibilityLabel accessibilityHint? variant?('plain'\|'tonal'\|'filled'\|'translucent'\|'outline'\|'outline-on-surface') size?('sm'\|'md'\|'lg') disabled? badge?(number \| string \| boolean) dot? selected? haptic?('none'\|'light'\|'selection'\|'medium')|
 |`Press`|onPress?(fn) onLongPress?(fn) children?(node) accessibilityLabel accessibilityHint? accessibilityRole?('button'\|'link'\|'tab'\|'radio'\|'checkbox'\|'switch'\|'menuitem') accessibilityState?(AccessibilityState) disabled? haptic?('none'\|'light'\|'selection'\|'medium') activeScale? hitSlop?|
+|`ProductCard`|product(ProductCardItem) width onOpen(fn) onHeart?(fn) saved? footer?(node) badgeSlot?(node)|
 |`Reveal`|children?(node) index? delay? offset?|
 |`Scrim`|progress(Animated.Value \| Animated.Ani…) active onPress?(fn) accessibilityLabel?|
 |`SectionHeader`|title eyebrow? action? onAction?(fn) actionLabel?|
 |`Sheet`|open onClose(fn) children?(node) title? trailing?(node) footer?(node) height?(DimensionValue) contentStyle?(style) closeLabel?|
 |`Skeleton`|width?(DimensionValue) height? radius? circle?|
-|`StateView`|title body? actionLabel? onAction?(fn) tone?('neutral'\|'error') icon?(node) inline?|
+|`Snackbar`|visible message actionLabel? onAction?(fn) onDismiss(fn) bottom? duration?|
+|`StateView`|title body? actionLabel? onAction?(fn) tone?('neutral'\|'error') icon?(node) badge?(node) variant?('inline'\|'card') inline?|
+|`Toggle`|value onValueChange(fn) accessibilityLabel accessibilityHint? size?('sm'\|'md') disabled? haptic?('none'\|'light'\|'selection'\|'medium')|
 |`Icon`|name(IconName) size? color? strokeWidth? filled? accessibilityLabel?|
 
-Hooks: `useReducedMotion` (../components/useReducedMotion). The host bridge: `bridge()` from `../components/bridge`, always optional-chained.
+Hooks: `useCountUp` (../components/useCountUp), `useReducedMotion` (../components/useReducedMotion). The host bridge: `bridge()` from `../components/bridge`, always optional-chained.
 
 ### Example
 ```tsx

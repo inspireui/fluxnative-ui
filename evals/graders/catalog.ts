@@ -19,7 +19,7 @@ export interface CatalogComponent {
 export interface Catalog {
   /** Every file the layer ships, relative to `files/` (`components/Button.tsx`, `theme/tokens.ts`). */
   files: string[];
-  /** The primitives: default-exported components in `components/*.tsx`. */
+  /** The primitives: default-exported components in `components/*.tsx` and one folder down (`components/commerce/ProductCard.tsx`). */
   components: Map<string, CatalogComponent>;
 }
 
@@ -30,7 +30,7 @@ export function loadCatalog(dir: string = CATALOG_FILES): Catalog {
   if (hit) return hit;
   const files = walk(dir).map((file) => relative(dir, file).split('\\').join('/'));
   const sources = files
-    .filter((rel) => /^components\/[^/]+\.tsx$/.test(rel))
+    .filter((rel) => /^components\/(?:[^/]+\/)?[^/]+\.tsx$/.test(rel))
     .map((rel) => ts.createSourceFile(rel, readFileSync(join(dir, rel), 'utf8'), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX));
 
   const interfaces = new Map<string, ts.InterfaceDeclaration>();
